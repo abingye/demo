@@ -1,0 +1,140 @@
+@-webkit-keyframes spinner-spin{
+	0%{-webkit-transform:rotate(0deg)}
+	8.33333333%{-webkit-transform:rotate(30deg)}
+	16.66666667%{-webkit-transform:rotate(60deg)}
+	25%{-webkit-transform:rotate(90deg)}
+	33.33333333%{-webkit-transform:rotate(120deg)}
+	41.66666667%{-webkit-transform:rotate(150deg)}
+	50%{-webkit-transform:rotate(180deg)}
+	58.33333333%{-webkit-transform:rotate(210deg)}
+	66.66666667%{-webkit-transform:rotate(240deg)}
+	75%{-webkit-transform:rotate(270deg)}
+	83.33333333%{-webkit-transform:rotate(300deg)}
+	91.66666667%{-webkit-transform:rotate(330deg)}
+	100%{-webkit-transform:rotate(360deg)}
+}
+
+@keyframes spinner-spin{
+	0%{transform:rotate(0deg)}
+	8.33333333%{transform:rotate(30deg)}
+	16.66666667%{transform:rotate(60deg)}
+	25%{transform:rotate(90deg)}
+	33.33333333%{transform:rotate(120deg)}
+	41.66666667%{transform:rotate(150deg)}
+	50%{transform:rotate(180deg)}
+	58.33333333%{transform:rotate(210deg)}
+	66.66666667%{transform:rotate(240deg)}
+	75%{transform:rotate(270deg)}
+	83.33333333%{transform:rotate(300deg)}
+	91.66666667%{transform:rotate(330deg)}
+	100%{transform:rotate(360deg)}
+}
+.pagingWrapper{
+	text-align: center; margin-top: 5px; margin-bottom: 5px; font-size: 13px;
+	span{
+		padding: 3px 7px; display: inline-block;
+	}
+	a{
+		font-style: normal; display: inline-block; vertical-align: middle;
+	}
+
+	.pagingContainer{
+		a{
+			font-size: 12px;
+			min-width: 32px;
+			display: inline-block;
+			height: 32px; line-height: 32px;
+			padding: 0 5px;
+			margin: 0 3px;
+			font-weight: bold;
+			color: #495060;
+			cursor: pointer;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+			background: #fff;
+			border-radius: 3px;
+			border: 1px solid #e1e4e8;
+		}
+		a:hover, a:focus{
+			text-decoration: none;
+			border-color: #2d8cf0;
+			color: #2d8cf0;
+		}
+	}
+	a.pagingPrev5, a.pagingNext5{
+		color: #d1d5da;
+		.dot{ display: block;}
+		.arrow{ display: none;}
+	}
+	a:hover.pagingPrev5, a:hover.pagingNext5{
+		border-color: #e1e4e8;
+		.dot{ display: none; }
+		.arrow{ display: block;}
+	}
+	a.pagingDisabled, em.pagingDisabled, a:hover.pagingDisabled, a:focus.pagingDisabled{
+		color: #d1d5da; cursor: default; background-color: #fafbfc; cursor: default; background-color: #fff; border-color: #e1e4e8;
+	}
+	a.pagingDisabled, a:hover.pagingDisabled{cursor: not-allowed;}
+	a.pagingCurrent{
+		color: #fff;
+		background-color: #2d8cf0;
+		border-color: #2d8cf0;
+		cursor: default;
+	}
+	a:hover.pagingCurrent, a:focus.pagingCurrent{ color: #fff;}
+	input, select{border-radius: 3px; border: 1px solid #e1e4e8; padding: 0 5px; width: 60px; height: 32px; line-height: 32px; margin: 0 5px; outline:none;}
+	select{ width: 100px;}
+	.pagingElevator{ padding: 3px 15px;vertical-align: middle;}
+
+	.pagingTotal{}
+	.pagingOption{}
+
+
+
+}
+
+.pagingWrapper.mini{
+	.pagingContainer{
+		a{
+			min-width: 24px; height: 24px; line-height: 24px;
+			border: none;
+		}
+	}
+	select, input{ height: 24px; line-height: 24px;
+		width:25px;}
+}
+.pagingElevator.mini {
+	em {
+		display: inline-block;
+	}
+}
+
+.pagingBottomWrapper{
+	width: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+	.pagingBottom{
+		overflow: hidden; width: 100%; padding: 15px 0; text-align: center; color: #777; font-size: 14px;
+		visibility: hidden;
+		.iconfont{ font-size: 14px;}
+		.pagingLoading{
+			width: 24px;
+			height: 24px;
+			vertical-align: middle;
+			display: inline-block;
+			transition: -webkit-transform 0.3s ease-in;
+			transform: rotate(180deg);
+			animation: spinner-spin 1s step-end infinite;
+		}
+		.pagingLoading:before{
+			display:block;
+			width:100%;
+			height:100%;
+			content:'';
+			background-image:url('data:image/svg+xml;charset=utf-8,<svg viewBox=\'0 0 120 120\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\'><defs><line id=\'l\' x1=\'60\' x2=\'60\' y1=\'7\' y2=\'27\' stroke=\'%236c6c6c\' stroke-width=\'11\' stroke-linecap=\'round\'/></defs><g><use xlink:href=\'%23l\' opacity=\'.27\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(30 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(60 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(90 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(120 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(150 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.37\' transform=\'rotate(180 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.46\' transform=\'rotate(210 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.56\' transform=\'rotate(240 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.66\' transform=\'rotate(270 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.75\' transform=\'rotate(300 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.85\' transform=\'rotate(330 60,60)\'/></g></svg>');
+		}
+		.pagingPullCaption{ display: inline-block;}
+	}
+
+	.pagingScroll{width: 100%;}
+}

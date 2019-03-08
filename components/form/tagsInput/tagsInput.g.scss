@@ -1,0 +1,91 @@
+/*taginput*/
+.bootstrap-tagsinput {
+  cursor: text;
+  //padding: 2px;
+  //border: solid 1px #a9a9a9;
+  min-height: 38px;
+  line-height: 26px;
+  margin-left: 4px;
+  //border-radius: 4px;
+  input {
+    height: 38px;
+    padding-left: 3px;
+    border:none;
+  }
+  .tag {
+    display: inline-block;
+    padding: 0 3px;
+    margin-top: 6px;
+    color: white;
+    background-color: #48b0f7 !important;
+    border-radius: 3px;
+
+    [data-role="remove"] {
+      margin-left: 1px;
+      cursor: pointer;
+      color: #007aff;
+      padding: 0 5px;
+
+      &:after {
+        content: "x";
+      }
+    }
+  }
+}
+
+// 新的tagInput 样式
+.tags-input-wrapper{
+  background-color: #fff;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 5px;
+  padding: 0 10px 5px;
+  margin-right: -10px;
+
+  &::before{
+    display: table;
+    content: "";
+  }
+
+  .tag-wrapper{
+    display: inline-block;
+    margin-right: 10px;
+    position: relative;
+    height: 30px;
+    line-height: 30px;
+    margin-top: 5px;
+
+    &.tag-label-wrapper{
+      padding: 0 26px 0 10px;
+      color: #fff;
+      background-color: #48b0f7!important;
+      border-radius: 3px;
+      transition: opacity .3s;
+
+      .remove{
+        position: absolute;
+        right: 2px;
+        top: 1px;
+        cursor: pointer;
+        color: #007aff;
+        padding: 0 3px;
+        text-decoration: none;
+      }
+
+      .remove:hover{
+        opacity: .5;
+      }
+    }
+
+    .tag-input{
+      margin: 0;
+      background-color: transparent;
+      border: none;
+      padding: 0;
+      height: auto;
+      width: auto;
+    }
+
+  }
+}
+
+

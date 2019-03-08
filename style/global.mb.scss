@@ -1,0 +1,18 @@
+html * {
+  -webkit-overflow-scrolling: touch;
+  //box-sizing: border-box;
+  //user-select: none;
+  //-webkit-user-select: none;
+}
+html.no-overflow-scrolling * {
+  -webkit-overflow-scrolling: auto;
+}
+
+
+body{
+  // 解决移动端iOS 委托事件不生效的bug
+  cursor: pointer;
+}
+@import "global";
+@import "../components/table/table.mb";
+@import "../components/mbList/mbList.mb";

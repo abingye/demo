@@ -1,0 +1,188 @@
+//#testMoney {
+//  .cashier-body {
+//    padding: 0 0 0 0 !important;
+//    margin: 0 !important;
+//    p{
+//      text-align: center;
+//      &:first-child {
+//        padding-top:15px;
+//      }
+//    }
+//  }
+//  border: 1px solid #eee;
+//  padding: 0;
+//  color: #666;
+//  font-family: 微软雅黑;
+//  .align-center {
+//    text-align: center;
+//  }
+//  .sale-title h1, label {
+//    font-family: 微软雅黑;
+//    color: #666;
+//  }
+//  .sale-title h1 {
+//    font-size: 20px;
+//    line-height: 60px;
+//  }
+//  .sale-header {
+//    background-color: #fff;
+//    .sale-title {
+//      position: relative;
+//      height: 50px;
+//      margin: 0;
+//      padding: 0;
+//      border-top: 2px solid #eee;
+//      position: relative;
+//      h1 {
+//        display: inline-block;
+//        font-size: 28px;
+//        line-height: 50px;
+//      }
+//      .sale-light {
+//        display: inline-block;
+//        color: red;
+//        position: absolute;
+//        top: 10px;
+//        left: 2%;
+//      }
+//      .sale-time {
+//        display: inline-block;
+//        text-align: right;
+//        color: #000;
+//        position: absolute;
+//        top: 16px;
+//        right: 2%;
+//      }
+//    }
+//    .sale-navigation {
+//      background-color: #108ee9;
+//      .sale-hotkey {
+//        display: inline-block;
+//        width: 70%;
+//        text-align: left;
+//        div {
+//          margin-top: 1px;
+//          display: inline-block;
+//          width: 13%;
+//          text-align: center;
+//          span::before {
+//            color: #fff;
+//            font-size: 32px;
+//          }
+//          p {
+//            color: #fff;
+//            margin-top: -10px;
+//            margin-bottom:6px;
+//          }
+//        }
+//      }
+//      //p {
+//      //  margin: 0;
+//      //  padding: 0;
+//      //}
+//    }
+//  }
+//  .sale-info {
+//    padding-left:1%;
+//    border-top: 1px solid #eee;
+//    background-color: #fff;
+//    height: 35px;
+//    line-height: 35px;
+//    font-size: 14px;
+//    label {
+//      margin-right: 12px;
+//    }
+//  }
+//  .sale-table {
+//    height: 550px;
+//    width: 100%;
+//    table {
+//      border-top: 1px solid #eee;
+//      border-collapse: collapse;
+//      width: 100%;
+//      padding: 10px;
+//    }
+//    td, th {
+//      border-right: 1px solid #eee;
+//      border-bottom: 1px solid #eee;
+//      padding: 10px;
+//      color: #000;
+//    }
+//    th {
+//      font-weight: normal;
+//      text-align: center;
+//    }
+//    thead th {
+//      background-color: #eee;
+//      color: #000;
+//      border-right: 1px solid #ddd;
+//      font-weight: bold;
+//      //background-color: #108ee9;
+//      //color: #fff;
+//    }
+//    tbody tr {
+//      background-color: #fff;
+//      color: #000;
+//    }
+//  }
+//  .sale-count {
+//    width:100%;
+//    height: 30px;
+//    line-height: 30px;
+//    background-color: #EBEBEB;
+//    border-bottom: 1px solid #888888;
+//    label {
+//      display: inline-block;
+//      width: 22%;
+//      color: #333;
+//      font-size: 16px;
+//      font-weight: bold;
+//      text-align: left;
+//    }
+//  }
+//  .sale-log {
+//    padding-left:1%;
+//    font-size: 13px;
+//    height: 35px;
+//    line-height: 35px;
+//    background-color: #108ee9;
+//    label {
+//      font-weight:bold;
+//      color: #fff;
+//    }
+//  }
+//  .product-table {
+//    overflow-y: auto;
+//    width: 100%;
+//    table {
+//      border-top: 1px solid #ccc;
+//      border-collapse: collapse;
+//      width: 100%;
+//      padding: 10px;
+//    }
+//    td, th {
+//      border-right: 1px solid #ccc;
+//      border-bottom: 1px solid #ccc;
+//      padding: 3px 20px;
+//      white-space: nowrap;
+//      overflow: hidden;
+//      text-overflow: ellipsis;
+//      max-width: 300px;
+//    }
+//    thead th {
+//      background-color: #eee;
+//      border-right: 1px solid #ddd;
+//      text-align: center;
+//      color: #000;
+//      font-weight: bold;
+//    }
+//
+//    tbody tr {
+//      background-color: #fff;
+//    }
+//    .tr-select {
+//      background-color: #108ee9;
+//      color: #fff;
+//    }
+//  }
+//}

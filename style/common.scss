@@ -1,0 +1,67 @@
+/*disabled不可点击类*/
+html, body {
+  direction: ltr;
+  font-family: sans-serif, Helvetica, Arial;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  -webkit-font-smoothing: antialiased !important;
+  //-webkit-user-select: none;
+  //user-select: none;
+}
+
+body.fl-pc{
+  font-family: "Microsoft YaHei UI", "微软雅黑", sans-serif;
+}
+
+.disabled, [disabled]{
+  opacity: .5;
+  pointer-events: auto !important;
+}
+.disabled-none{
+  opacity: .5;
+  pointer-events: none !important;
+}
+.hide {
+  display: none !important;
+}
+.show {
+  display: block!important;
+}
+.invisible {
+  visibility: hidden;
+}
+.padding-30 {
+  padding: 30px !important;
+}
+
+.padding-top-10 {
+  padding-top: 10px !important;
+}
+
+.margin-bottom-10 {
+  margin-bottom: 10px !important;
+}
+
+.margin-bottom-25 {
+  margin-bottom: 25px !important;
+}
+
+.margin-top-25 {
+  margin-top: 25px !important;
+}
+
+:after, :before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+:focus{
+  outline: none;
+}
+
+ul, li{
+  list-style: none;
+}

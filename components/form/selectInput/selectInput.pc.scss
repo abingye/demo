@@ -1,0 +1,18 @@
+
+.dropdown-menu{
+  padding: 0;
+  max-height: 247px;
+  overflow-y: auto;
+  min-width: 0;
+  //width: 100%;
+  &>li {
+    padding: 3px 10px;
+    &>span{
+      margin-left: 11px;
+    }
+  }
+  &>li:hover{
+    background: #f5f5f5;
+    cursor: pointer;
+  }
+}

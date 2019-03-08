@@ -1,0 +1,43 @@
+.notify{
+  position: fixed;
+  width: 335px;
+  height: auto;
+  z-index: 1100;
+  .notifyItem{
+    padding: 16px 16px 10px 16px;
+    border-radius: 4px;
+    box-shadow : 0 2px 8px rgba(0,0,0,.2);
+    line-height : 1.5;
+    margin-bottom : 10px;
+    overflow :hidden;
+    z-index: 1100;
+    transition: all 2s;
+    opacity: 0;
+    display: block;
+    color: black;
+    position: relative;
+    .close{
+      position: absolute;
+      z-index: 2000;
+      top: 10px;
+      right: 10px;
+      font-size: 12px;
+    }
+    .myIcon{
+      position: absolute;
+      left: 13px;
+      top: 30px;
+      font-size: 24px;
+    }
+    .title{
+      font-size: 14px;
+      color: rgba(0,0,0,.85);
+      margin-bottom: 4px;
+      line-height: 20px;
+      display: inline-block;
+    }
+    .content{
+      font-size: 12px;
+    }
+  }
+}

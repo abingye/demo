@@ -1,0 +1,181 @@
+.select-box-wrapper{
+  $selectedColor: #0099ff;
+
+  &.selected-tag-wrapper{
+    .select-box {
+      &:not(:last-child){
+        margin-right: 20px;
+      }
+      input + span {
+        display: none;
+      }
+      input + span + span {
+        display: inline-block;
+        background-color: #d8e3e9;
+        height: 34px;
+        line-height: 34px;
+        padding: 0 24px;
+        position: relative;
+        overflow: hidden;
+        transition: background-color 0.2s linear 0s, color 0.2s linear 0s;
+        font-weight: inherit;
+        user-select: none;
+        &:before{
+          content: "";
+          display: block;
+          position: absolute;
+          width: 12px;
+          height: 6px;
+          transform-origin: center center;
+          transform: rotateZ(-45deg);
+          right: 3px;
+          bottom: 6px;
+          z-index: 1;
+          user-select: none;
+          transition: border 0.2s linear 0.2s;
+          border: none;
+        }
+        &:after {
+          display: block;
+          content: "";
+          position: absolute;
+          width: 0;
+          height: 0;
+          right: -20px;
+          bottom: -20px;
+          user-select: none;
+          transition: border 0.2s linear 0s;
+          transform-origin: center center;
+          transform: rotateZ(45deg);
+          border: 0 solid #00a6ed;
+        }
+      }
+      input:checked + span + span {
+        background-color: #e7f8ff;
+        color: $selectedColor;
+        &:before{
+          border-bottom: 2px solid #fff;
+          border-left: 2px solid #fff;
+        }
+        &:after{
+          border: 20px solid #00a6ed;
+        }
+      }
+    }
+
+  }
+
+  &.selected-btn-box-wrapper {
+    &.small-select-box-wrapper{
+      .select-box {
+        input + span + span {
+          padding: 4px 12px;
+          font-size: 12px;
+        }
+
+        &:first-child{
+          input + span + span {
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+          }
+        }
+        &:last-child{
+          input + span + span {
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+          }
+        }
+      }
+    }
+    &.middle-select-box-wrapper{
+      .select-box {
+        input + span + span {
+          padding: 8px 24px;
+          font-size: 16px;
+        }
+
+        &:first-child{
+          input + span + span {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+          }
+        }
+        &:last-child{
+          input + span + span {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+          }
+        }
+      }
+    }
+    &.big-select-box-wrapper{
+      .select-box {
+        input + span + span {
+          padding: 12px 36px;
+          font-size: 20px;
+        }
+
+        &:first-child{
+          input + span + span {
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+          }
+        }
+        &:last-child{
+          input + span + span {
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+          }
+        }
+      }
+    }
+    &.super-big-select-box-wrapper{
+      .select-box {
+        input + span + span {
+          padding: 16px 48px;
+          font-size: 24px;
+        }
+
+        &:first-child{
+          input + span + span {
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+          }
+        }
+        &:last-child{
+          input + span + span {
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+          }
+        }
+      }
+    }
+
+    .select-box {
+      input + span {
+        display: none;
+      }
+      input + span + span {
+        display: inline-block;
+        border: 1px solid $selectedColor;
+        background: #fff;
+        color: $selectedColor;
+        font-weight: inherit;
+      }
+      input:checked + span + span {
+        color: #fff;
+        background-color: $selectedColor;
+      }
+      &:not(:first-child) {
+        input + span + span {
+          border-left: none;
+        }
+      }
+      &:not(:last-child) {
+        input[type=checkbox]:checked + span + span {
+          border-right-color: #fff;
+        }
+      }
+    }
+  }
+}

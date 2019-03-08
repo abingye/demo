@@ -1,0 +1,14 @@
+.uploader-com {
+  .webuploader-pick{
+     overflow: hidden;
+     input{
+       border : none;
+     }
+   }
+  .webuploader-element-invisible {
+    position: absolute;
+    height: 34px;
+    opacity: 0;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,135 @@
+@import "table.g";
+$green:#4CD964;
+
+/*---------- mobileTable -----------*/
+.mobileTableWrapper {
+  &.hasIndexCol .indexCol > div, &.hasPseudoCol .pseudoCol > div, table.mobileTable tr td{
+     height: $rowHeight + 4px;
+    line-height: $rowHeight / 2;
+  }
+  &.hasIndexCol .indexCol > div, &.hasPseudoCol .pseudoCol > div {
+    overflow: hidden;
+    height: $rowHeight + 4px;
+    font-size: 14px;
+    line-height: $rowHeight + 4px;
+    i.iconfont{margin-top: 0;}
+  }
+}
+.mobileTableReorderPanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+  z-index: 999;
+
+  .buttons {
+    padding: 10px;
+
+    .cancel {
+      color: #999;
+    }
+  }
+  .colList {
+    margin: 0;
+    font-size: 15px;
+    position: relative;
+    padding: 10px 0 10px 10px;
+    li {
+      display: inline-block;
+      padding: 5px;
+
+      &.placeholder {
+        color: #fff;
+
+        span {
+          border-style: dashed;
+        }
+      }
+      &.draging {
+        position: absolute;
+        z-index: 1000;
+      }
+      &.before span::before {
+        position: absolute;
+        top: 0;
+        left: -5px;
+        bottom: 0;
+        width: 2px;
+        background-color: $green;
+        content: ' ';
+
+      }
+
+      span {
+        position: relative;
+        display: block;
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+      }
+    }
+  }
+}
+
+table.mobileTable {
+  thead {
+    tr {
+      th {
+        div{
+          font-size: 14px;
+          line-height: 18px;
+        }
+        &.sort div {
+          padding-right: 15px;
+          background: url("../img/sort_both.png") no-repeat center right;
+        }
+      }
+    }
+  }
+  tbody{
+    tr {
+      td {
+       font-size: 14px;
+        & > .detail-more{
+          display: block !important;
+        }
+      }
+    }
+  }
+  &.hideLock[data-lock-num='1'] tr {
+    td, th {
+      &:nth-child(1) {
+        visibility: hidden;
+        border-color: transparent;
+      }
+    }
+  }
+  &.hideLock[data-lock-num='2'] tr {
+    td, th {
+      &:nth-child(1), &:nth-child(2) {
+        visibility: hidden;
+        border-color: transparent;
+
+      }
+    }
+  }
+  &.hideLock[data-lock-num='3'] tr {
+    td, th {
+      &:nth-child(1), &:nth-child(2), &:nth-child(3) {
+        visibility: hidden;
+        border-color: transparent;
+      }
+    }
+  }
+  &.hideLock[data-lock-num='4'] tr {
+    td, th {
+      &:nth-child(4) {
+        visibility: hidden;
+        border-color: transparent;
+      }
+    }
+  }
+}
+

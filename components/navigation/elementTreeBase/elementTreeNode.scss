@@ -1,0 +1,94 @@
+.element-tree-node {
+  white-space: nowrap;
+  min-width: 100%;
+  width: auto;
+  overflow: visible;
+  .tree-open-icon {
+    display: inline-block !important;
+    cursor: pointer;
+    //z-index: 10000;
+    position: relative;
+  }
+  &>.tree-child-wrapper {
+    float: left;
+    width: auto;
+    min-width: 100%;
+    position: relative;
+  }
+  .tree-text-wrapper {
+    user-select: none;
+    font-size: 12px;
+    display: inline-block;
+    height: 24px;
+    white-space: nowrap;
+    line-height: 24px;
+    min-width: 100%;
+    width: auto;
+    float: left;
+    .tree-icon {
+      padding-right: 0;
+    }
+    .collect_btn {
+      cursor: pointer;
+      font-size: 13px;
+      position: absolute;
+      right: 20px;
+      line-height: 16px;
+      top: 8px;
+      width: 20px;
+      height: 20px;
+      .iconfont {
+        font-size: 15px;
+      }
+      .has_collect {
+        color: #FFB400;
+      }
+      .un_collect {
+        color: lightgray
+      }
+    }
+    .un_collect_btn {
+      visibility: hidden!important;
+    }
+  }
+  &:after {
+    content: ' ';
+    display: block;
+    position: relative;
+    clear: both;
+    //width: 100%;
+    //height: 1px;
+    //background-color: #ccc;
+    //top: 0
+  }
+  &.selected>.tree-text-wrapper {
+    background-color: #01bedc;
+    color: #ecf6fd;
+    &:after {
+      background-color: transparent;
+    }
+  }
+  .tree-rotate-icon {
+    animation: tree-rotation 1s linear infinite;
+    -webkit-animation: tree-rotation 1s linear infinite;
+  }
+  i {
+    width: auto;
+    height: auto;
+  }
+}
+
+.element-tree-node:hover {
+  &>.tree-text-wrapper>.un_collect_btn {
+    visibility: visible!important;
+  }
+}
+
+@keyframes tree-rotation {
+  from {
+    transform: rotate(0)
+  }
+  to {
+    transform: rotate(360deg)
+  }
+}

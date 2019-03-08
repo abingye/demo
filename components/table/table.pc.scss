@@ -1,0 +1,164 @@
+@import "table.g";
+$selectedHoverColor : darken($selectedColor, 8%);
+  table.mobileTable {
+    tbody{
+      tr.edit{
+        background: lightgoldenrodyellow;
+        td{
+          color: #333;
+        }
+      }
+    }
+    td.blue {
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    tbody tr td{
+      height: $rowHeight;
+      font-size: 12px;
+      line-height: 12px;
+
+    }
+
+    thead tr th div{
+      line-height: 15px;
+    }
+  }
+
+  .pcTableMenu.col-menu.list-group {
+    width: 130px;
+    background-color: #fafafa;
+    color: #666;
+    position: absolute;
+    box-shadow: 0 0 20px 0 #ccc;
+    z-index: 1;
+    top: 35px;
+    right: 0;
+    .list-group-item {
+      .ul-list{
+        max-height:165px; overflow: auto; position: absolute;z-index: 3; right:-130px; top: 0px; display: none;
+      }
+      padding: 7px 10px;
+      background-color: transparent;
+      cursor: pointer;
+      color: black;
+      //border-radius: 0;
+
+      input {
+        width: 150px;
+        height: 32px;
+        border: none !important;
+        background-color: #f1f1f1 !important;
+      }
+      &:hover:not(.disabled) > ul{
+        display: block !important;
+      }
+      &:focus, &:hover {
+        color: #555;
+        text-decoration: none;
+        background-color: #f1f1f1;
+      }
+
+      &.sub-list {
+
+        position: relative;
+        .list-group {
+          position: absolute;
+          right: -152px;
+          top: -1px;
+          display: none;
+        }
+        &:hover .list-group {
+          display: block;
+        }
+        .list-group-item {
+          padding: 0;
+        }
+      }
+    }
+  }
+
+  .pcTableConfirm.col-menu.list-group{
+    position: absolute;
+    z-index: 3;
+    border:1px solid #ececec;
+    border-bottom: none;
+    margin: 0;
+    display: none;
+    .list-group-item{
+      border-radius: 0;
+      border: none;
+      padding: 5px 10px;
+      background: lightgoldenrodyellow;
+      cursor: pointer;
+      &:first-child{
+        color: $green;
+        font-weight: bold;
+      }
+      &:last-child{
+        color: $red;
+      }
+      &:hover{
+        background: lightyellow;
+      }
+    }
+  }
+
+  .mobileTableWrapper{
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1)!important;
+    margin-top: 6px;
+    .col-hover{
+      background: #e0eaf7 !important;
+    }
+    .selected.col-hover{
+      background: $selectedHoverColor !important;
+    }
+    &.hasIndexCol .indexCol > div, &.hasPseudoCol .pseudoCol > div {
+      overflow: hidden;
+      height: $rowHeight;
+      font-size: 12px;
+      line-height: 12px;
+    }
+    &.hasIndexCol .indexCol > div{
+      line-height: $rowHeight;
+    }
+    &.hasIndexCol .indexCol > div:first-child, &.hasPseudoCol .pseudoCol > div:first-child{
+      height: 28px;
+    }
+    .table-out-bottom{
+      text-align: center;
+      box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .mobileTableWrapper table.mobileTable tr td {
+    transition: background .2s cubic-bezier(.175,.885,.32,1);
+  }
+  table.mobileTable thead tr th div {
+    transition: background .2s cubic-bezier(.175,.885,.32,1);
+  }
+  .mobileTableWrapper.hasIndexCol .indexCol, .mobileTableWrapper.hasPseudoCol .pseudoCol{
+    div{
+      cursor: pointer;
+    }
+  }
+  .mobileTableWrapper .mobileTableMiddle {
+    //min-height: 258px;
+  }
+  table.mobileTable thead tr th.sort div {
+    background: none;
+  }
+  .nodata {
+    text-align: center;
+    padding-top: 10vh;
+    &.no-padding {
+      padding-top: 0;
+    }
+    .iconfont {
+      font-size: 200px;
+      line-height: 1;
+      color: #999;
+    }
+  }

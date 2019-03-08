@@ -1,0 +1,10 @@
+.uploader-wrapper{
+  display: inline-block;
+  input[type=file]{
+    display: none;
+  }
+  .uploader-box{
+    cursor: pointer;
+  }
+
+}

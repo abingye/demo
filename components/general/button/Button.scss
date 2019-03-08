@@ -1,0 +1,239 @@
+$color-default: #007AFF;
+$btn-small-height : 24px;
+@mixin btn-color($color, $bg-color, $hover-color) {
+  color: $color;
+  background-color: #fff;
+  border: 1px solid $color;
+  &:hover{
+    color : #fff;
+    background-color: $hover-color;
+    border-color: $hover-color;
+  }
+}
+@mixin btn-type($color, $bg-color, $bd-color, $hover-color, $hover-bg-color, $hover-bd-color){
+  color:  $color;
+  background-color:  $bg-color;
+  border-color: $bd-color;
+  &:hover {
+    @if ($hover-color) {
+      color: $hover-color;
+    }
+    @if ($hover-bg-color) {
+      background-color: $hover-bg-color;
+    }
+    @if ($hover-bd-color) {
+      border-color: $hover-bd-color;
+    }
+  }
+}
+@mixin btn-size($padding, $height, $size, $bd-radius){
+  padding: 0 $padding;//9.12
+  height: $height;//28.36
+  line-height: $height;
+  font-size: $size;
+  border-radius: $bd-radius;//4.5
+  i {
+    max-width: 15px;
+    max-height: 15px;
+    font-size: $size;//14.16
+  }
+  span {
+    margin-right: $bd-radius;
+  }
+}
+
+@mixin btn-link-color($color){
+  color : $color;
+  border: none!important;
+  background: none!important;
+  &:hover{
+    color : $color;
+    border: none!important;
+    background: none!important;
+  }
+}
+
+@mixin btn-primary-color($color, $hover-color){
+  color: #fff!important;
+  border: $color;
+  background-color: $color;
+  &:hover{
+    background-color: $hover-color;
+    border-color: $hover-color;
+  }
+}
+
+.btn {
+  -webkit-transition: all 0.3s ease 0s !important;
+  transition: all 0.3s ease 0s !important;
+  .iconfont{
+    font-size: 12px;
+  }
+  .spinner{
+    border-color: #108ee9;
+    border-bottom-color: transparent;
+  }
+
+  &.button-small {
+    @include btn-size(6px, 24px, 12px, 3px);
+  }
+  &.button-middle {
+    @include btn-size(9px, 28px, 14px, 4px);
+  }
+  &.button-large {
+    @include btn-size(12px, 36px, 16px, 4px);
+  }
+
+  &.button-type-default {
+    @include btn-type(rgba(0,0,0,.65), #fff, #d9d9d9,  #108ee9, rgb(255, 255, 255), #108ee9);
+  }
+  &.button-type-primary {
+    @include btn-type(#fff, #108ee9, #108ee9, #fff, #57a3f3, #57a3f3);
+  }
+  &.button-type-link{
+    @include btn-type(#108ee9, #fff, none,  #108ee9, none, none);
+    border: none;
+  }
+
+  &.button-blue{
+    @include btn-color($color-default, #fff, $color-default);
+    border: 1px solid $color-default!important;
+    cursor: pointer;
+    margin-left: -1px!important;
+    &:hover {
+      color: $color-default!important;
+      background: #f7f7f8!important;
+    }
+  }
+  &.button-error{
+    @include btn-color(#ed3f14, #fff, #f16543);
+  }
+  &.button-warning{
+    @include btn-color(#f90, #fff, #ffad33);
+  }
+  &.button-success{
+    @include btn-color(#19be6b, #fff, #47cb89);
+  }
+  &.button-danger{
+    @include btn-color(#f04134, #fff, #f04134);
+  }
+  &.button-info{
+    @include btn-color(#2db7f5, #fff, #57c5f7);
+  }
+
+  &.button-type-link{
+    &.button-blue{
+      @include btn-link-color($color-default);
+    }
+    &.button-error{
+      @include btn-link-color(#ed3f14);
+    }
+    &.button-warning{
+      @include btn-link-color(#f90);
+    }
+    &.button-success{
+      @include btn-link-color(#19be6b);
+    }
+    &.button-danger{
+      @include btn-link-color(#f04134);
+    }
+    &.button-info{
+      @include btn-link-color(#2db7f5);
+    }
+  }
+
+  &.button-type-primary{
+    &.button-blue{
+      @include btn-primary-color($color-default, #57a3f3!important);
+    }
+    &.button-error{
+      @include btn-primary-color(#ed3f14, #f16543);
+    }
+    &.button-warning{
+      @include btn-primary-color(#f90, #ffad33);
+    }
+    &.button-success{
+      @include btn-primary-color(#19be6b, #47cb89);
+    }
+    &.button-danger{
+      @include btn-primary-color(#f04134, #f04134);
+    }
+    &.button-info{
+      @include btn-primary-color(#2db7f5, #57c5f7);
+    }
+  }
+}
+
+.button-group{
+  .btn{
+    //margin-right: -1px!important;
+  }
+  .button-sm:last-child{
+    border-top-right-radius: 3px!important;
+    border-bottom-right-radius: 3px!important;
+  }
+  .button-round:first-child{
+    border-bottom-left-radius: 30px;
+    border-top-left-radius: 30px;
+  }
+  .button-round:last-child{
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+  }
+}
+
+//登录
+.button-animate .iconfont {
+  font-size: 20px!important;
+  transition: all 218ms;
+  position: absolute;
+  left: 50%;
+  opacity: 0;
+  line-height: 1;
+  &：hover{
+    color: #fff;
+    left: 45%;
+    opacity: 1;
+  }
+}
+
+.button-green{
+  border: 1px solid #32C25A;
+  color: #32C25A;
+  background: #fff;
+  &:hover {
+    background-color: #32C25A !important;
+    color: #fff!important;
+  }
+}
+.button-red{
+  border: 1px solid #FB4D43;
+  color: #FB4D43;
+  background: #fff;
+  &:hover {
+    background-color: #FB4D43 !important;
+    color: #fff!important;
+  }
+}
+
+.button-animate{
+  .iconfont{
+    font-size: 20px;
+    -webkit-transition: all 218ms;
+    transition: all 218ms;
+    position: absolute;
+    left: 50%;
+    opacity: 0;
+    line-height: 1;
+  }
+  &:hover .text{
+    opacity: 0;
+  }
+  &:hover .iconfont{
+    color: #fff;
+    left: 45%;
+    opacity: 1;
+  }
+}
+
+

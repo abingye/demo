@@ -1,0 +1,31 @@
+$search-font-size-width: 34px;
+.text-input.search-input{
+  height: $search-font-size-width;
+  line-height: $search-font-size-width;
+  //position: absolute;
+  width: 100%;
+  .mail-search{
+    height: $search-font-size-width;
+    width: 100%!important;
+    padding-left: 10px;
+    background: #dddde8;
+    transition: background .3s;
+    color: #8e8e93;
+    font-size: 14px; 
+  }
+  .mail-search:focus{
+    background: white;
+  }
+  .btn-group{
+    height: $search-font-size-width;
+    line-height: $search-font-size-width;
+    a.icon{
+      height: $search-font-size-width;
+      line-height: $search-font-size-width;
+      width: $search-font-size-width!important;
+    }
+  }
+}
+.text-input:focus{
+  background: white;
+}

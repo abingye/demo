@@ -1,0 +1,31 @@
+.resizeLeft,.resizeTop,.resizeRight,.resizeBottom{
+  position: absolute;
+  background: #000;
+  overflow: hidden;
+  opacity: 0;
+  z-index: 1003;
+}
+.resizeTop,.resizeBottom{
+  cursor: n-resize;
+  width: 100%;
+  height: 5px;
+}
+.resizeLeft,.resizeRight{
+  cursor: e-resize;
+  height: 100%;
+  width: 5px;
+}
+.resizeTop{
+  top:0;
+}
+.resizeBottom{
+  bottom: 0;
+}
+.resizeLeft{
+  left: 0;
+}
+.resizeRight{
+  right: 0;
+  top:0;
+  float: right;
+}

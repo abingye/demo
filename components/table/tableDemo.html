@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>tableDemo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .blue {
+            color: blue;
+        }
+        .btn-control{
+            padding: 10px;
+        }
+        .btn-control button{ margin: 0 5px; padding: 3px 5px; }
+    </style>
+    <link rel="stylesheet" href="../../../web/font/iconfont/iconfont.css">
+    <link rel="stylesheet" href="../../../web/dist/components/table.pc.css">
+    <link rel="stylesheet" href="../../../web/dist/components/paging.css">
+    <link rel="stylesheet" href="../../../web/plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="../css/table.css"> -->
+
+</head>
+<body>
+<div id="example">
+    <div class="btn-control">
+        <button type="button" onclick="clickHandle('crosstab')">>>> 创建交叉表</button>
+        <button type="button" onclick="clickHandle('abc')">>>> ABC分析</button>
+        <button type="button" onclick="exportHandle('csv')">>>> 导出csv</button>
+        <button type="button" onclick="exportHandle('xls')">>>> 导出excel</button>
+        <button type="button" onclick="exportHandle('doc')">>>> 导出word</button>
+        <button type="button" onclick="exportHandle('image')">>>> 导出png</button>
+        <button type="button" onclick="exportHandle('pdf')">>>> 导出pdf</button>
+        <button type="button" onclick="checkSelect()">>>> 获取拖拽选中单元格数据</button>
+        <button type="button" onclick="checkRowsSelect()">>>> 获取拖拽选中行数据</button>
+    </div>
+    <div class="btn-control">
+        <button type="button" onclick="Table.col.hide('配货单号');" style="color: red;">>>> 隐藏《配货单号》</button>
+        <button type="button" onclick="Table.col.show('配货单号');" style="color: red;">>>> 显示《配货单号》</button>
+    </div>
+    <div style="margin: 10px;">
+        <table id="pcTable" class="min-width">
+            <tbody></tbody>
+        </table>
+
+        <div id="page"></div>
+        <div id="page2"></div>
+        <div id="page4"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <table id="pcTable4" class="min-width">
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>触底自动加载 & 拖拽选中</h4>
+                </div>
+                <div class="col-md-6">
+                    <h4>触底手动加载</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6" id="page3Container" style="height: 400px;">
+                    <div id="page3">
+                        <div class="pagingScroll">
+                            <table id="pcTable2" class="min-width">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" id="page5Container" style="height: 400px;">
+                    <div id="page5">
+                        <div class="pagingScroll">
+                            <table id="pcTable3" class="min-width">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="height: 1000px;"></div>
+
+<!--<script type="text/babel">-->
+
+<!--</script>-->
+
+</body>
+<script src="../../../web/plugin/y-ui/dist/js/utils.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/modal.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/tableExport.min.js"></script>
+<script src="../../../web/dist/require.js"></script>
+<script src="../../../web/dist/require.config.js"></script>
+<script>
+     require.config({
+        baseUrl: '../../../web/dist/',
+        bundles: {
+            'components/tablePc': ['BasicTable', 'PcTable'],
+            'components/tableMb': ['BasicTable', 'MbTable'],
+            'components/dialog': ['dialog'],
+            'components/statistic': ['statistic'],
+            'components/paging': ['paging']
+        }
+    });
+    var __extends = (this && this.__extends) || (function () {
+            var extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            return function (d, b) {
+                extendStatics(d, b);
+                function __() { this.constructor = d; }
+                d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+            };
+        })();
+</script>
+<script src="../../../web/dist/global.pc.js"></script>
+<script src="../../../web/dist/components.js"></script>
+
+<script>
+
+    require(['PcTable', 'paging', 'dialog', 'statistic'], function (PcTable, paging, dialog, statistic) {
+        var table = document.getElementById('pcTable');
+
+        window.page = new paging.Paging({
+            el: document.getElementById('page'),
+            pageOption : [],
+            pageSize : 20,
+            change : function(offset, pageSize ) {
+                console.log(offset, pageSize);
+            }
+        });
+
+        window.page2 = new paging.Paging({
+            el: document.getElementById('page2'),
+            class: 'mini',
+            offset: 80,
+            recordTotal: 3000
+        });
+        window.page4 = new paging.Paging({
+            el: document.getElementById('page4'),
+            pageOption: [],
+            offset: 0,
+            recordTotal: 0,
+            pageSize: 10,
+            last: false,
+            change: function(option) {
+//                setTimeout(function() {
+//                    page4.reset({last: false});
+//                }, 100);
+                console.log(4444 , option);
+            }
+        });
+        page4.go(2);
+        window.Table = new PcTable.PcTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            length : 10,
+            thead: true,
+            table: table,
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            /*pseudoCol: {
+                width: 30,
+                render: function(index) {
+                    var btn;
+
+//                    btn = document.createElement('button');
+//                    btn.innerHTML= '设置';
+
+                    btn = '<i class="iconfont icon-weihu"></i>';
+                    return btn;
+                },
+                click: function(index, event) {
+                    console.log(index, event);
+                }
+            },*/
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            cellMaxWidth: 150,
+            dragSelect: function(data) {
+                console.log(data);
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [{
+                multi: true,
+                title: '锁定/解锁列',
+                callback: function (btn, cols, btnDom, bt) {
+                    bt.colToggleLock(cols[0].dataset.col);
+                    bt.rowToggleLock();
+                }
+            }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+
+                bt.conf.ajax = function(mtData, myData, callback){
+
+                    // 伪列
+                    bt.pseudoColFun.init({
+                        width: 30,
+                        render: function(index) {
+                            var btn;
+                            btn = '<i class="iconfont icon-weihu"></i>';
+                            return btn;
+                        },
+                        click: function(index, event) {
+                            console.log(index, event);
+                        }
+                    });
+
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+
+
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+
+
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+        window.Table4 = new PcTable.PcTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            expand: {
+                enabled: true,
+                //mode: 'accordion',
+                render: function(row, index, callback) {    // 展开行的回调填充函数
+
+                    // 方式一：默认输出当前行所有字段
+                    callback();
+
+                    // 方式二：键值对输出
+                    /*callback({
+                        '选项1': 123123,
+                        '选项2': 123123,
+                        '选项3': 123123,
+                        '选项4': 123123
+                    });*/
+
+                    // 方式三：自定义输出
+                    //callback('<div>myData</div>');
+
+                    // 方式四：ajax
+                    /* XMLHttpRequest...((data)=>{
+                        callback('<div>myData</div>');
+                    })
+                    */
+                }
+            },
+            pseudoCol: {
+                width: 30,
+                render: function(index) {
+                    var btn;
+
+//                    btn = document.createElement('button');
+//                    btn.innerHTML= '设置';
+
+                    btn = '<i class="iconfont icon-weihu"></i>';
+                    return btn;
+                },
+                click: function(index, event) {
+                    console.log(index, event);
+                }
+            },
+            dragRows: function(data) { // 拖拽选中行
+                console.log(data);
+            },
+            treegrid: {
+                enabled: true,                          // 是否启用
+                cache: false,                           // 是否缓存(是否每次展开都执行render)
+                icon: ['arrow-right', 'arrow-down'],    // 未展开|展开 图标
+                expand: function(nodeData, index) {          // 是否可展开
+                    //console.log('expand', row, index, level);
+                    if(index === 2) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                render: function(nodeData, index, callback) {  // 展开行的回调填充函数
+                    console.log('render', nodeData);
+                    callback(getData1());
+                }
+            },
+            length : 10,
+            thead: true,
+            table: document.getElementById('pcTable4'),
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            cellMaxWidth: 150,
+            dragSelect: function(data) {
+                console.log(data);
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+
+
+
+                bt.conf.ajax = function(mtData, myData, callback){
+
+
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+
+
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+
+
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+        /*window.Table2 = new PcTable.PcTable({
+            Container: document.querySelector('#page3'),
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            length : 30,
+            thead: true,
+            cellMaxWidth: 150,
+            table: document.getElementById('pcTable2'),
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            colResize: true, // 列宽调整
+            dragRows: function(data) { // 拖拽选中行
+                console.log(data);
+            },
+//            dragSelect: function(data) {
+//                console.log(data);
+//            },
+            lockColNum: 1,
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+                bt.conf.ajax = function(mtData, myData, callback){
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+        window.Table3 = new PcTable.PcTable({
+            Container: document.querySelector('#page5'),
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            length : 30,
+            thead: true,
+            table: document.getElementById('pcTable3'),
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            //cellMaxWidth: 150,
+            dragSelect: function(data) {
+                console.log(data);
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+                bt.conf.ajax = function(mtData, myData, callback){
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });*/
+
+        window.page3 = new paging.Paging({
+            el: document.getElementById('page3'),
+            scroll: {
+                Container: document.getElementById('page3Container'),
+                auto: true
+            },
+            change: function(option, callback) {
+                // console.log(offset, pageSize, callback, resolve);
+                // 加载完成，隐蔽加载动画
+                setTimeout(()=> {
+                    page3.reset({last: false});  // 加载完成
+                    //page3.reset({last: true}); // 加载完成，没有更多数据了
+                }, 1000);
+            }
+        });
+        window.page5 = new paging.Paging({
+            el: document.getElementById('page5'),
+            scroll: {
+                Container: document.getElementById('page5Container'),
+                auto: false
+            },
+            change: function(option, callback) {
+
+                // 加载完成，隐蔽加载动画
+                setTimeout(()=> {
+                    page5.reset({last: false});  // 加载完成
+                    //page5.reset({last: true}); // 加载完成，没有更多数据了
+                }, 1000);
+            }
+        });
+
+
+
+
+
+        var stat = new statistic.Statistic({
+            dialog: dialog.Dialog,
+            cols: Table.conf.cols,
+            data: Table.conf.data
+        });
+        window.clickHandle = function(type) {
+            if(type === 'crosstab') {
+                /*var cols = getCols1(),
+                    data = stat.crossTab({
+                        row: ['配货单号', 'GOO_ID'],
+                        //row: ['GOO_ID'],
+                        col: ['GOO_NAME', 'CUSGROUPNAME'],
+                        val: ['PASSIGNAMOUNT', 'RASSIGNMONEY'],
+                        cols: Table.conf.cols,
+                        data: Table.tableData
+                    });
+                console.log(JSON.stringify(data.cols));
+                console.log(JSON.stringify(data.data));
+                //console.log('crossTab', data);*/
+
+                var cols = getCols1(),
+                    data = stat.crossTab({
+                        row: ['BRA_NAME'],
+                        col: ['GOO_NAME'],
+                        val: ["WARMDEGREE", "INPRICE", "PRICE"],
+                        cols: [{"caption":"店号","title":"店号","name":"SHO_ID","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"},{"caption":"分部","title":"分部","name":"BRA_NAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":8,"comType":"input"},{"caption":"货号","title":"货号","name":"GOO_ID","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":7,"comType":"input"},{"caption":"条码","title":"条码","name":"BARCODE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"},{"caption":"品名","title":"品名","name":"GOO_NAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"顾客群","title":"顾客群","name":"CUSGROUPNAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"品类组","title":"品类组","name":"CATEGORYGROUP","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"品类","title":"品类","name":"CATEGORIES","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"子品类","title":"子品类","name":"SUBCATEGORY","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"季节","title":"季节","name":"SEASON","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"款式","title":"款式","name":"PATTERN","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"特征","title":"特征","name":"SPECS","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"风格","title":"风格","name":"GOOSTYLE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"主题","title":"主题","name":"THEME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":12,"comType":"input"},{"caption":"质地","title":"质地","name":"MATERIAL","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"系列","title":"系列","name":"SERIES","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"设计方式","title":"设计方式","name":"DESIGNMODE","noEdit":false,"noSum":0,"defaultValue":"供应商设计","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"流行度","title":"流行度","name":"POPULARITY","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"厚度","title":"厚度","name":"WARMDEGREE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"10","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"商品类别","title":"商品类别","name":"GOOSTYLENAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"集中管理","title":"集中管理","name":"ISUM","noEdit":false,"noSum":0,"defaultValue":"False","dataType":"17","displayFormat":"","trueExpr":"1","displayWidth":0,"comType":"toggle"},{"caption":"必订店群","title":"必订店群","name":"MUSTSHOPGROUPS","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":40,"comType":"input"},{"caption":"供应商","title":"供应商","name":"SUP_NAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":30,"comType":"input"},{"caption":"饰品品类","title":"饰品品类","name":"STRUCTURE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"颜色","title":"颜色","name":"COLORNAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":20,"comType":"input"},{"caption":"码数","title":"码数","name":"SIZENAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"},{"caption":"标准色名","title":"标准色名","name":"STDCOLORNAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"进价","title":"进价","name":"INPRICE","noEdit":false,"noSum":1,"defaultValue":"","dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"},{"caption":"定价","title":"定价","name":"PRICE","noEdit":false,"noSum":1,"defaultValue":"","dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"},{"caption":"售价","title":"售价","name":"SALEPRICE","noEdit":false,"noSum":1,"defaultValue":"","dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"},{"caption":"原售价","title":"原售价","name":"OLDPRICE","noEdit":false,"noSum":1,"defaultValue":"","dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"},{"caption":"创建时间","title":"创建时间","name":"CREATETIME","noEdit":false,"noSum":0,"defaultValue":"%date%","dataType":"12","displayFormat":"yyyy-MM-dd HH:mm:ss","trueExpr":"","displayWidth":0,"comType":"datetime"},{"caption":"备注","title":"备注","name":"MEMO","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":100,"comType":"input"},{"caption":"执行标准","title":"执行标准","name":"EXECUTIVESTD","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":20,"comType":"input"},{"caption":"安全技术类别","title":"安全技术类别","name":"SAFETYTYPE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":20,"comType":"input"},{"caption":"接触类型","title":"接触类型","name":"TOUCHCLASS","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":4,"comType":"input"},{"caption":"含义","title":"含义","name":"MEAN","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"地址","title":"地址","name":"ADDRESS","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":60,"comType":"input"},{"caption":"级别","title":"级别","name":"LEVELNAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"验货员","title":"验货员","name":"CHECKER","noEdit":false,"noSum":0,"defaultValue":"陈明树","dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"成份","title":"成份","name":"COMPOSNAME","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":30,"comType":"input"},{"caption":"号型","title":"号型","name":"SHAPE","noEdit":false,"noSum":0,"defaultValue":"","dataType":"","displayFormat":"","trueExpr":"","displayWidth":15,"comType":"input"},{"caption":"是否O2O","title":"是否O2O","name":"ISO2O","noEdit":false,"noSum":0,"defaultValue":"False","dataType":"17","displayFormat":"","trueExpr":"1","displayWidth":0,"comType":"toggle"}],
+                        data: [{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"黄色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811304","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811304","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黄色12#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"宝蓝","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811305","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811305","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"白底宝蓝条9#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"桃红","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811302","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811302","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"白底玫红条21#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"精白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811309","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811309","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"灰底白条11#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"灰色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811313","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811313","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"灰色46#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"宝蓝","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811306","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811306","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"白底宝蓝条9#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"精白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811310","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811310","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"灰底白条11#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"象牙白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811312","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811312","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"象牙白16#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"象牙白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811311","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811311","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"象牙白16#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"黑色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811307","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811307","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黑色1#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"灰色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811314","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811314","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"灰色46#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"黄色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811303","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811303","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黄色12#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"桃红","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811301","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811301","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"白底玫红条21#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.L","SALEPRICE":39,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"9308#+9309#","PRICE":39,"STDCOLORNAME":"黑色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32811308","COMPOSNAME":" 面料1 95% 棉 5% 氨纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"买手部设计","SUP_NAME":"年泰制衣厂","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"背心","MUSTSHOPGROUPS":null,"SUBCATEGORY":"28寸吊带","CUSGROUPNAME1":"休闲少女","ISO2O":1,"GOO_ID":"328113","BAKCODE":"32811308","OLDPRICE":39,"SAFETYTYPE":"GB18401-2010","INPRICE":16,"PATTERN":"A1背心","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"基本款","THEME":"少女休闲","CATEGORIES":"背心","LEVELNAME":"合格品","CREATETIME":"2014-02-21 17:44:56","CATEGORYGROUP":"上装","ADDRESS":"东莞市虎门镇北面苏屋路口二栋厂房二楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黑色1#","ISUM":0,"MATERIAL":"2*2罗纹","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"黑色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812903","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812903","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黑色51#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"精白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812905","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812905","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"精白2#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"S","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"桃红","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812901","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812901","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"桃红110#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"精白","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812906","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812906","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"精白2#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"黑色","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812904","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812904","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"黑色51#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"},{"GOO_NAME":"SANFU.F","SALEPRICE":99,"MEMO":null,"SIZENAME":"M","CHECKER":"008","SPECS":"3346#","PRICE":99,"STDCOLORNAME":"桃红","SEASON":"夏1","TOUCHCLASS":"B类","BARCODE":"32812902","COMPOSNAME":" 面料1 80% 棉 20% 涤纶","SHAPE":null,"SERIES1":"活","DESIGNMODE":"供应商设计","SUP_NAME":"东莞市伊柏年服饰有限公司","CUSGROUPNAME":"休闲少女","GOOSTYLENAME":"集中采购","CATEGORIES1":"杂项","MUSTSHOPGROUPS":null,"SUBCATEGORY":"其他","CUSGROUPNAME1":"休闲少女","ISO2O":0,"GOO_ID":"328129","BAKCODE":"32812902","OLDPRICE":99,"SAFETYTYPE":"GB18401-2010","INPRICE":45,"PATTERN":"D4杂项","WARMDEGREE":null,"BRA_NAME":"女装","BRA_NAME1":"女装:","POPULARITY":"流行款","THEME":"少女休闲","CATEGORIES":"杂项","LEVELNAME":"合格品","CREATETIME":"2014-02-21 18:50:30","CATEGORYGROUP":"上装","ADDRESS":"虎门镇镇口第二工业区步行街6号五楼","EXECUTIVESTD":"GB/T22849-2009","SHO_ID":"GZZ","GOOSTYLE":"流行","STRUCTURE":null,"COLORNAME":"桃红110#","ISUM":0,"MATERIAL":"32支单卫衣","SERIES":"活力女孩","MEAN":"直接接触皮肤的产品","SEASON1":"X1"}]
+                    });
+                console.log(JSON.stringify(data.cols));
+                console.log(JSON.stringify(data.data));
+                //console.log('crossTab', data);
+            }
+            else if(type === 'abc') {
+                var data = stat.abc({
+                    row : 'GOO_ID',
+                    val : 'PASSIGNMONEY',
+                    a   : 65,
+                    b   : 85,
+                    cols: Table.conf.cols,
+                    data: Table.tableData
+                });
+                //console.log(JSON.stringify(data.cols));
+                //console.log(JSON.stringify(data.data));
+                console.log('ABC', data);
+            }
+        }
+
+        window.checkSelect = function() {
+            console.log(Table.dragSelect.selected);
+        }
+        window.checkRowsSelect = function() {
+            console.log(Table2.dragRows.selected);
+        }
+    });
+
+
+    function initPagination(bTable, isEnd) {
+        var html1 = '<div class="myPagenation btn-group"><div class="btn-group dropup" dropdown-toggle>',
+            html2 = '', html3 = '<button class="btn btn-link disabled" data-action="currentPage">第<span id="CurrentPageNum">1</span>页</button>' +
+                '<button class="btn btn-link disabled" data-action="firstPage"><span class="icon iconfont icon-zhuye"></span></button>' +
+                '<button class="btn btn-link disabled" data-action="previousPage"><span class="icon iconfont icon-arrow-left"></span></button>' +
+                ("<button class=\"btn btn-link " + (isEnd ? 'disabled' : '') + "\" data-action=\"nextPage\"><span class=\"icon iconfont icon-arrow-right\"></span></button></div>");
+
+        var pagination = G.d.create(html1 + html2 + html3), currentPageDom = pagination.querySelector('#CurrentPageNum'), previousDom = pagination.querySelector('[data-action=previousPage]'), firstDom = pagination.querySelector('[data-action=firstPage]'), nextDom = pagination.querySelector('[data-action=nextPage]');
+        var tableBottom = G.d.create('<div style="text-align: center" class="table-out-bottom"></div>');
+        tableBottom.appendChild(pagination);
+        bTable.wrapperGet().appendChild(tableBottom);
+
+        // 事件绑定
+        G.d.on(pagination, 'click', function () {
+            switch (this.dataset.action) {
+                case 'firstPage':
+                    //第一页
+                    bTable.page.go(1);
+                    break;
+                case 'previousPage':
+                    //上一页
+                    bTable.page.previous();
+                    break;
+                case 'nextPage':
+                    //下一页
+                    bTable.page.next();
+                    break;
+                default:
+            }
+        });
+        statusChange(isEnd, true);
+        // 翻页事件
+        bTable.wrapperGet().addEventListener('page.bt', function (e) {
+            statusChange(e.detail.isEnd, e.detail.type === 'refresh');
+        });
+
+        // 分页按钮开启与禁用和当前页数更新
+        function statusChange(isEnd, refresh) {
+            if (refresh && isEnd) {
+                pagination.classList.add('hide');
+            }
+            else {
+                var currPage = bTable.currentPageGet(), method = void 0;
+                pagination.classList.remove('hide');
+                method = currPage <= 1 ? 'add' : 'remove';
+                previousDom.classList[method]('disabled');
+                firstDom.classList[method]('disabled');
+                method = isEnd ? 'add' : 'remove';
+                nextDom.classList[method]('disabled');
+                currentPageDom.innerHTML = (currPage === 0 ? 1 : currPage).toString();
+            }
+        }
+    }
+
+
+    function getCols() {
+        return [{
+            "caption": "地区名",
+            "title": "地区名",
+            "name": "ARE_NAME",
+            "data": "ARE_NAME",
+            "dataType": "",
+            "displayFormat": "",
+            "trueExpr": "",
+            "displayWidth": "",
+            "webDrillAddr": {
+                "dataAddr": "/app_sanfu_retail/null/ui?uiType=webdrill&page=drill&resId=web_600006&fieldname=ARE_ID&fromresId=web_600000&par_data_path=web_600000%2Fvar-1&variant_id=var-1&needparam=are_name&needparam=are_id",
+                "varList": [{"varType": 0, "varName": "ARE_ID"}, {"varType": 0, "varName": "ARE_NAME"}],
+                "needGps": 0
+            }
+        }, {
+            "caption": "店数",
+            "title": "店数",
+            "name": "SHOPCOUNT",
+            "data": "SHOPCOUNT",
+            "dataType": "",
+            "displayFormat": "",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "销售额",
+            "title": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "name": "SALEMONEY",
+            "data": "SALEMONEY",
+            "dataType": "11",
+            "displayFormat": "###.00",
+            "trueExpr": "",
+            "displayWidth": "",
+            "webDrillAddr": {
+                "dataAddr": "/app_sanfu_retail/null/ui?uiType=webdrill&page=drill&resId=web_600007&fieldname=ARE_ID&fromresId=web_600000&par_data_path=web_600000%2Fvar-1&variant_id=var-1&needparam=salemoney&needparam=are_id",
+                "varList": [{"varType": 0, "varName": "ARE_ID"}, {"varType": 0, "varName": "SALEMONEY"}],
+                "needGps": 0
+            },
+            "webDrillAddrWithNull": {
+                "dataAddr": "/app_sanfu_retail/null/ui?uiType=webdrill&page=drill&resId=web_600009&fieldname=ARE_ID&fromresId=web_600000&par_data_path=web_600000%2Fvar-1&variant_id=var-1&needparam=salemoney",
+                "varList": [{"varType": 0, "varName": "SALEMONEY"}],
+                "needGps": 0
+            }
+        }, {
+            "caption": "销售额占有率销售额占有率销售额占有率",
+            "title": "销售额占有率销售额占有率销售额占有率",
+            "name": "SALERATE",
+            "data": "SALERATE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "毛利率",
+            "title": "毛利率",
+            "name": "PROFITRATIO",
+            "data": "PROFITRATIO",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": "",
+            "webDrillAddr": {
+                "dataAddr": "/app_sanfu_retail/null/ui?uiType=webdrill&page=drill&resId=web_600008&fieldname=ARE_ID&fromresId=web_600000&par_data_path=web_600000%2Fvar-1&variant_id=var-1&needparam=profitratio&needparam=are_id",
+                "varList": [{"varType": 0, "varName": "ARE_ID"}, {"varType": 0, "varName": "PROFITRATIO"}],
+                "needGps": 0
+            },
+            "webDrillAddrWithNull": {
+                "dataAddr": "/app_sanfu_retail/null/ui?uiType=webdrill&page=drill&resId=web_600010&fieldname=ARE_ID&fromresId=web_600000&par_data_path=web_600000%2Fvar-1&variant_id=var-1&needparam=profitratio",
+                "varList": [{"varType": 0, "varName": "PROFITRATIO"}],
+                "needGps": 0
+            }
+        }, {
+            "caption": "让利率",
+            "title": "让利率",
+            "name": "DEDUCTRATIO",
+            "data": "DEDUCTRATIO",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "销售达成率",
+            "title": "销售达成率",
+            "name": "SALEACHIEVERATE",
+            "data": "SALEACHIEVERATE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "毛利额达成",
+            "title": "毛利额达成",
+            "name": "PROFITACHIEVERATE",
+            "data": "PROFITACHIEVERATE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": 7
+        }, {
+            "caption": "销售绝对递增",
+            "title": "销售绝对递增",
+            "name": "SALEABSINCREASE",
+            "data": "SALEABSINCREASE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "毛利绝对递增",
+            "title": "毛利绝对递增",
+            "name": "PROFITABSINCREASE",
+            "data": "PROFITABSINCREASE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "销售相对递增",
+            "title": "销售相对递增",
+            "name": "SALERELINCREASE",
+            "data": "SALERELINCREASE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": 7
+        }, {
+            "caption": "毛利相对递增",
+            "title": "毛利相对递增",
+            "name": "PROFITRELINCREASE",
+            "data": "PROFITRELINCREASE",
+            "dataType": "14",
+            "displayFormat": "0.0%",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "周转率",
+            "title": "周转率",
+            "name": "VELOCITY",
+            "data": "VELOCITY",
+            "dataType": "10",
+            "displayFormat": "0.000",
+            "trueExpr": "",
+            "displayWidth": ""
+        }, {
+            "caption": "库存金额",
+            "title": "库存金额",
+            "name": "STOCKMONEY",
+            "data": "STOCKMONEY",
+            "dataType": "11",
+            "displayFormat": "￥#,###.00",
+            "trueExpr": "",
+            "displayWidth": ""
+        }
+        ];
+    }
+    function getData() {
+        return [{
+            "ARE_ID": null,
+            "ARE_NAME": "全公司",
+            "SHOPCOUNT": 680,
+            "SALEMONEY": 10490567.3445,
+            "SALERATE": 1,
+            "PROFITRATIO": 0.518942,
+            "DEDUCTRATIO": 0.163044,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.171289,
+            "SALEABSINCREASE": 0.028961,
+            "PROFITABSINCREASE": 0.002847,
+            "SALERELINCREASE": 0.102729,
+            "PROFITRELINCREASE": 0.080596,
+            "VELOCITY": 0.1252599237,
+            "STOCKMONEY": 153174409.172
+        }, {
+            "ARE_ID": null,
+            "ARE_NAME": "全公司",
+            "SHOPCOUNT": 680,
+            "SALEMONEY": 10490567.3445,
+            "SALERATE": .8,
+            "PROFITRATIO": 0.528942,
+            "DEDUCTRATIO": 0.163044,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.171289,
+            "SALEABSINCREASE": 0.028961,
+            "PROFITABSINCREASE": 0.002847,
+            "SALERELINCREASE": 0.102729,
+            "PROFITRELINCREASE": 0.080596,
+            "VELOCITY": 0.1252599237,
+            "STOCKMONEY": 153174409.172
+        }, {
+            "ARE_ID": null,
+            "ARE_NAME": "全公司",
+            "SHOPCOUNT": 680,
+            "SALEMONEY": 10490567.3445,
+            "SALERATE": .6,
+            "PROFITRATIO": 0.538942,
+            "DEDUCTRATIO": 0.163044,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.171289,
+            "SALEABSINCREASE": 0.028961,
+            "PROFITABSINCREASE": 0.002847,
+            "SALERELINCREASE": 0.102729,
+            "PROFITRELINCREASE": 0.080596,
+            "VELOCITY": 0.1252599237,
+            "STOCKMONEY": 153174409.172
+        },{
+            "ARE_ID": "85",
+            "ARE_NAME": "电子商务",
+            "SHOPCOUNT": 1,
+            "SALEMONEY": 209.442,
+            "SALERATE": 0.000019,
+            "PROFITRATIO": 0.411822,
+            "DEDUCTRATIO": 0.343409,
+            "SALEACHIEVERATE": null,
+            "PROFITACHIEVERATE": null,
+            "SALEABSINCREASE": -0.984475,
+            "PROFITABSINCREASE": -0.975549,
+            "SALERELINCREASE": -0.98148,
+            "PROFITRELINCREASE": -0.969572,
+            "VELOCITY": 0.0053352406,
+            "STOCKMONEY": 71411.962
+        }, {
+            "ARE_ID": "CQ",
+            "ARE_NAME": "西南大区",
+            "SHOPCOUNT": 99,
+            "SALEMONEY": 1648394.156,
+            "SALERATE": 0.157131,
+            "PROFITRATIO": 0.536031,
+            "DEDUCTRATIO": 0.174751,
+            "SALEACHIEVERATE": 0.175,
+            "PROFITACHIEVERATE": 0.172032,
+            "SALEABSINCREASE": -0.039158,
+            "PROFITABSINCREASE": -0.06746,
+            "SALERELINCREASE": 0.022652,
+            "PROFITRELINCREASE": 0.002659,
+            "VELOCITY": 0.1458798052,
+            "STOCKMONEY": 20298042.173
+        }, {
+            "ARE_ID": "DB",
+            "ARE_NAME": "东北大区",
+            "SHOPCOUNT": 10,
+            "SALEMONEY": 119395.26,
+            "SALERATE": 0.011381,
+            "PROFITRATIO": 0.547716,
+            "DEDUCTRATIO": 0.144281,
+            "SALEACHIEVERATE": 0.224,
+            "PROFITACHIEVERATE": 0.222379,
+            "SALEABSINCREASE": 1.252981,
+            "PROFITABSINCREASE": 1.229025,
+            "SALERELINCREASE": 0.439332,
+            "PROFITRELINCREASE": 0.373384,
+            "VELOCITY": 0.1336119994,
+            "STOCKMONEY": 1491111.284
+        }, {
+            "ARE_ID": "FZ",
+            "ARE_NAME": "华南大区",
+            "SHOPCOUNT": 103,
+            "SALEMONEY": 1515944.741,
+            "SALERATE": 0.144505,
+            "PROFITRATIO": 0.550748,
+            "DEDUCTRATIO": 0.137338,
+            "SALEACHIEVERATE": 0.177,
+            "PROFITACHIEVERATE": 0.177174,
+            "SALEABSINCREASE": -0.00964,
+            "PROFITABSINCREASE": -0.026094,
+            "SALERELINCREASE": 0.078648,
+            "PROFITRELINCREASE": 0.06336,
+            "VELOCITY": 0.1386728563,
+            "STOCKMONEY": 19209460.174
+        }, {
+            "ARE_ID": "HB",
+            "ARE_NAME": "河北大区",
+            "SHOPCOUNT": 34,
+            "SALEMONEY": 410130.165,
+            "SALERATE": 0.039095,
+            "PROFITRATIO": 0.549558,
+            "DEDUCTRATIO": 0.147284,
+            "SALEACHIEVERATE": 0.188,
+            "PROFITACHIEVERATE": 0.188135,
+            "SALEABSINCREASE": 0.041833,
+            "PROFITABSINCREASE": 0.021765,
+            "SALERELINCREASE": 0.183391,
+            "PROFITRELINCREASE": 0.172735,
+            "VELOCITY": 0.1271959572,
+            "STOCKMONEY": 5594402.253
+        }, {
+            "ARE_ID": "HF",
+            "ARE_NAME": "华北大区",
+            "SHOPCOUNT": 121,
+            "SALEMONEY": 1968361.828,
+            "SALERATE": 0.187631,
+            "PROFITRATIO": 0.525991,
+            "DEDUCTRATIO": 0.183851,
+            "SALEACHIEVERATE": 0.161,
+            "PROFITACHIEVERATE": 0.155783,
+            "SALEABSINCREASE": 0.027592,
+            "PROFITABSINCREASE": -0.009606,
+            "SALERELINCREASE": 0.07429,
+            "PROFITRELINCREASE": 0.031337,
+            "VELOCITY": 0.1433974965,
+            "STOCKMONEY": 25874629.542
+        }, {
+            "ARE_ID": "NJ",
+            "ARE_NAME": "华东大区",
+            "SHOPCOUNT": 150,
+            "SALEMONEY": 2258939.337,
+            "SALERATE": 0.21533,
+            "PROFITRATIO": 0.544707,
+            "DEDUCTRATIO": 0.151776,
+            "SALEACHIEVERATE": 0.181,
+            "PROFITACHIEVERATE": 0.180025,
+            "SALEABSINCREASE": 0.134333,
+            "PROFITABSINCREASE": 0.108723,
+            "SALERELINCREASE": 0.156615,
+            "PROFITRELINCREASE": 0.133975,
+            "VELOCITY": 0.1549077852,
+            "STOCKMONEY": 26851152.072
+        }, {
+            "ARE_ID": "WH",
+            "ARE_NAME": "华中大区",
+            "SHOPCOUNT": 162,
+            "SALEMONEY": 2569192.4155,
+            "SALERATE": 0.244905,
+            "PROFITRATIO": 0.536606,
+            "DEDUCTRATIO": 0.166854,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.168418,
+            "SALEABSINCREASE": -0.004938,
+            "PROFITABSINCREASE": -0.032079,
+            "SALERELINCREASE": 0.139661,
+            "PROFITRELINCREASE": 0.123855,
+            "VELOCITY": 0.147779177,
+            "STOCKMONEY": 32350317.852
+        }, {
+            "ARE_ID": null,
+            "ARE_NAME": "全公司",
+            "SHOPCOUNT": 680,
+            "SALEMONEY": 10490567.3445,
+            "SALERATE": .8,
+            "PROFITRATIO": 0.548942,
+            "DEDUCTRATIO": 0.163044,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.171289,
+            "SALEABSINCREASE": 0.028961,
+            "PROFITABSINCREASE": 0.002847,
+            "SALERELINCREASE": 0.102729,
+            "PROFITRELINCREASE": 0.080596,
+            "VELOCITY": 0.1252599237,
+            "STOCKMONEY": 153174409.172
+        }, {
+            "ARE_ID": "85",
+            "ARE_NAME": "电子商务",
+            "SHOPCOUNT": 1,
+            "SALEMONEY": 209.442,
+            "SALERATE": 0.000019,
+            "PROFITRATIO": 0.411822,
+            "DEDUCTRATIO": 0.343409,
+            "SALEACHIEVERATE": null,
+            "PROFITACHIEVERATE": null,
+            "SALEABSINCREASE": -0.984475,
+            "PROFITABSINCREASE": -0.975549,
+            "SALERELINCREASE": -0.98148,
+            "PROFITRELINCREASE": -0.969572,
+            "VELOCITY": 0.0053352406,
+            "STOCKMONEY": 71411.962
+        }, {
+            "ARE_ID": "CQ",
+            "ARE_NAME": "西南大区",
+            "SHOPCOUNT": 99,
+            "SALEMONEY": 1648394.156,
+            "SALERATE": 0.157131,
+            "PROFITRATIO": 0.536031,
+            "DEDUCTRATIO": 0.174751,
+            "SALEACHIEVERATE": 0.175,
+            "PROFITACHIEVERATE": 0.172032,
+            "SALEABSINCREASE": -0.039158,
+            "PROFITABSINCREASE": -0.06746,
+            "SALERELINCREASE": 0.022652,
+            "PROFITRELINCREASE": 0.002659,
+            "VELOCITY": 0.1458798052,
+            "STOCKMONEY": 20298042.173
+        }, {
+            "ARE_ID": "DB",
+            "ARE_NAME": "东北大区",
+            "SHOPCOUNT": 10,
+            "SALEMONEY": 119395.26,
+            "SALERATE": 0.011381,
+            "PROFITRATIO": 0.547716,
+            "DEDUCTRATIO": 0.144281,
+            "SALEACHIEVERATE": 0.224,
+            "PROFITACHIEVERATE": 0.222379,
+            "SALEABSINCREASE": 1.252981,
+            "PROFITABSINCREASE": 1.229025,
+            "SALERELINCREASE": 0.439332,
+            "PROFITRELINCREASE": 0.373384,
+            "VELOCITY": 0.1336119994,
+            "STOCKMONEY": 1491111.284
+        }, {
+            "ARE_ID": "FZ",
+            "ARE_NAME": "华南大区",
+            "SHOPCOUNT": 103,
+            "SALEMONEY": 1515944.741,
+            "SALERATE": 0.144505,
+            "PROFITRATIO": 0.550748,
+            "DEDUCTRATIO": 0.137338,
+            "SALEACHIEVERATE": 0.177,
+            "PROFITACHIEVERATE": 0.177174,
+            "SALEABSINCREASE": -0.00964,
+            "PROFITABSINCREASE": -0.026094,
+            "SALERELINCREASE": 0.078648,
+            "PROFITRELINCREASE": 0.06336,
+            "VELOCITY": 0.1386728563,
+            "STOCKMONEY": 19209460.174
+        }, {
+            "ARE_ID": "HB",
+            "ARE_NAME": "河北大区",
+            "SHOPCOUNT": 34,
+            "SALEMONEY": 410130.165,
+            "SALERATE": 0.039095,
+            "PROFITRATIO": 0.549558,
+            "DEDUCTRATIO": 0.147284,
+            "SALEACHIEVERATE": 0.188,
+            "PROFITACHIEVERATE": 0.188135,
+            "SALEABSINCREASE": 0.041833,
+            "PROFITABSINCREASE": 0.021765,
+            "SALERELINCREASE": 0.183391,
+            "PROFITRELINCREASE": 0.172735,
+            "VELOCITY": 0.1271959572,
+            "STOCKMONEY": 5594402.253
+        }, {
+            "ARE_ID": "HF",
+            "ARE_NAME": "华北大区",
+            "SHOPCOUNT": 121,
+            "SALEMONEY": 1968361.828,
+            "SALERATE": 0.187631,
+            "PROFITRATIO": 0.525991,
+            "DEDUCTRATIO": 0.183851,
+            "SALEACHIEVERATE": 0.161,
+            "PROFITACHIEVERATE": 0.155783,
+            "SALEABSINCREASE": 0.027592,
+            "PROFITABSINCREASE": -0.009606,
+            "SALERELINCREASE": 0.07429,
+            "PROFITRELINCREASE": 0.031337,
+            "VELOCITY": 0.1433974965,
+            "STOCKMONEY": 25874629.542
+        }, {
+            "ARE_ID": "NJ",
+            "ARE_NAME": "华东大区",
+            "SHOPCOUNT": 150,
+            "SALEMONEY": 2258939.337,
+            "SALERATE": 0.21533,
+            "PROFITRATIO": 0.544707,
+            "DEDUCTRATIO": 0.151776,
+            "SALEACHIEVERATE": 0.181,
+            "PROFITACHIEVERATE": 0.180025,
+            "SALEABSINCREASE": 0.134333,
+            "PROFITABSINCREASE": 0.108723,
+            "SALERELINCREASE": 0.156615,
+            "PROFITRELINCREASE": 0.133975,
+            "VELOCITY": 0.1549077852,
+            "STOCKMONEY": 26851152.072
+        }, {
+            "ARE_ID": "WH",
+            "ARE_NAME": "华中大区",
+            "SHOPCOUNT": 162,
+            "SALEMONEY": 2569192.4155,
+            "SALERATE": 0.244905,
+            "PROFITRATIO": 0.536606,
+            "DEDUCTRATIO": 0.166854,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.168418,
+            "SALEABSINCREASE": -0.004938,
+            "PROFITABSINCREASE": -0.032079,
+            "SALERELINCREASE": 0.139661,
+            "PROFITRELINCREASE": 0.123855,
+            "VELOCITY": 0.147779177,
+            "STOCKMONEY": 32350317.852
+        }, {
+            "ARE_ID": null,
+            "ARE_NAME": "全公司",
+            "SHOPCOUNT": 680,
+            "SALEMONEY": 10490567.3445,
+            "SALERATE": .6,
+            "PROFITRATIO": 0.558942,
+            "DEDUCTRATIO": 0.163044,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.171289,
+            "SALEABSINCREASE": 0.028961,
+            "PROFITABSINCREASE": 0.002847,
+            "SALERELINCREASE": 0.102729,
+            "PROFITRELINCREASE": 0.080596,
+            "VELOCITY": 0.1252599237,
+            "STOCKMONEY": 153174409.172
+        }, {
+            "ARE_ID": "85",
+            "ARE_NAME": "电子商务",
+            "SHOPCOUNT": 1,
+            "SALEMONEY": 209.442,
+            "SALERATE": 0.000019,
+            "PROFITRATIO": 0.411822,
+            "DEDUCTRATIO": 0.343409,
+            "SALEACHIEVERATE": null,
+            "PROFITACHIEVERATE": null,
+            "SALEABSINCREASE": -0.984475,
+            "PROFITABSINCREASE": -0.975549,
+            "SALERELINCREASE": -0.98148,
+            "PROFITRELINCREASE": -0.969572,
+            "VELOCITY": 0.0053352406,
+            "STOCKMONEY": 71411.962
+        }, {
+            "ARE_ID": "CQ",
+            "ARE_NAME": "西南大区",
+            "SHOPCOUNT": 99,
+            "SALEMONEY": 1648394.156,
+            "SALERATE": 0.157131,
+            "PROFITRATIO": 0.536031,
+            "DEDUCTRATIO": 0.174751,
+            "SALEACHIEVERATE": 0.175,
+            "PROFITACHIEVERATE": 0.172032,
+            "SALEABSINCREASE": -0.039158,
+            "PROFITABSINCREASE": -0.06746,
+            "SALERELINCREASE": 0.022652,
+            "PROFITRELINCREASE": 0.002659,
+            "VELOCITY": 0.1458798052,
+            "STOCKMONEY": 20298042.173
+        }, {
+            "ARE_ID": "DB",
+            "ARE_NAME": "东北大区",
+            "SHOPCOUNT": 10,
+            "SALEMONEY": 119395.26,
+            "SALERATE": 0.011381,
+            "PROFITRATIO": 0.547716,
+            "DEDUCTRATIO": 0.144281,
+            "SALEACHIEVERATE": 0.224,
+            "PROFITACHIEVERATE": 0.222379,
+            "SALEABSINCREASE": 1.252981,
+            "PROFITABSINCREASE": 1.229025,
+            "SALERELINCREASE": 0.439332,
+            "PROFITRELINCREASE": 0.373384,
+            "VELOCITY": 0.1336119994,
+            "STOCKMONEY": 1491111.284
+        }, {
+            "ARE_ID": "FZ",
+            "ARE_NAME": "华南大区",
+            "SHOPCOUNT": 103,
+            "SALEMONEY": 1515944.741,
+            "SALERATE": 0.144505,
+            "PROFITRATIO": 0.550748,
+            "DEDUCTRATIO": 0.137338,
+            "SALEACHIEVERATE": 0.177,
+            "PROFITACHIEVERATE": 0.177174,
+            "SALEABSINCREASE": -0.00964,
+            "PROFITABSINCREASE": -0.026094,
+            "SALERELINCREASE": 0.078648,
+            "PROFITRELINCREASE": 0.06336,
+            "VELOCITY": 0.1386728563,
+            "STOCKMONEY": 19209460.174
+        }, {
+            "ARE_ID": "HB",
+            "ARE_NAME": "河北大区",
+            "SHOPCOUNT": 34,
+            "SALEMONEY": 410130.165,
+            "SALERATE": 0.039095,
+            "PROFITRATIO": 0.549558,
+            "DEDUCTRATIO": 0.147284,
+            "SALEACHIEVERATE": 0.188,
+            "PROFITACHIEVERATE": 0.188135,
+            "SALEABSINCREASE": 0.041833,
+            "PROFITABSINCREASE": 0.021765,
+            "SALERELINCREASE": 0.183391,
+            "PROFITRELINCREASE": 0.172735,
+            "VELOCITY": 0.1271959572,
+            "STOCKMONEY": 5594402.253
+        }, {
+            "ARE_ID": "HF",
+            "ARE_NAME": "华北大区",
+            "SHOPCOUNT": 121,
+            "SALEMONEY": 1968361.828,
+            "SALERATE": 0.187631,
+            "PROFITRATIO": 0.525991,
+            "DEDUCTRATIO": 0.183851,
+            "SALEACHIEVERATE": 0.161,
+            "PROFITACHIEVERATE": 0.155783,
+            "SALEABSINCREASE": 0.027592,
+            "PROFITABSINCREASE": -0.009606,
+            "SALERELINCREASE": 0.07429,
+            "PROFITRELINCREASE": 0.031337,
+            "VELOCITY": 0.1433974965,
+            "STOCKMONEY": 25874629.542
+        }, {
+            "ARE_ID": "NJ",
+            "ARE_NAME": "华东大区",
+            "SHOPCOUNT": 150,
+            "SALEMONEY": 2258939.337,
+            "SALERATE": 0.21533,
+            "PROFITRATIO": 0.544707,
+            "DEDUCTRATIO": 0.151776,
+            "SALEACHIEVERATE": 0.181,
+            "PROFITACHIEVERATE": 0.180025,
+            "SALEABSINCREASE": 0.134333,
+            "PROFITABSINCREASE": 0.108723,
+            "SALERELINCREASE": 0.156615,
+            "PROFITRELINCREASE": 0.133975,
+            "VELOCITY": 0.1549077852,
+            "STOCKMONEY": 26851152.072
+        }, {
+            "ARE_ID": "WH",
+            "ARE_NAME": "华中大区",
+            "SHOPCOUNT": 162,
+            "SALEMONEY": 2569192.4155,
+            "SALERATE": 0.244905,
+            "PROFITRATIO": 0.536606,
+            "DEDUCTRATIO": 0.166854,
+            "SALEACHIEVERATE": 0.174,
+            "PROFITACHIEVERATE": 0.168418,
+            "SALEABSINCREASE": -0.004938,
+            "PROFITABSINCREASE": -0.032079,
+            "SALERELINCREASE": 0.139661,
+            "PROFITRELINCREASE": 0.123855,
+            "VELOCITY": 0.147779177,
+            "STOCKMONEY": 32350317.852
+        }
+        ];
+    }
+
+    function getCols1() {
+        return [{"caption":"配货单号","title":"配货单号","name":"配货单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"},{"caption":"分部号","title":"分部号","name":"BRA_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":8,"comType":"input"},{"caption":"MOM订单号","title":"MOM订单号","name":"MOM订单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"},{"caption":"订单号","title":"订单号","name":"订单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"},{"caption":"ASN单据号","title":"ASN单据号","name":"ASN单据号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"},{"caption":"收货流水号","title":"收货流水号","name":"收货流水号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"},{"caption":"源店号","title":"源店号","name":"FROMSHOPID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"地区号","title":"地区号","name":"ARE_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"目标店号","title":"目标店号","name":"TOSHOPID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"店名","title":"店名","name":"SHO_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"创建时间","title":"创建时间","name":"CREATETIME","noEdit":false,"dataType":"12","displayFormat":"yyyy-MM-dd HH:mm:ss","trueExpr":"","displayWidth":0,"comType":"datetime"},{"caption":"结束时间","title":"结束时间","name":"FINISHTIME","noEdit":false,"dataType":"12","displayFormat":"yyyy-MM-dd HH:mm:ss","trueExpr":"","displayWidth":0,"comType":"datetime"},{"caption":"货号","title":"货号","name":"GOO_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":7,"comType":"input"},{"caption":"条码","title":"条码","name":"BARCODE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"},{"caption":"品名","title":"品名","name":"GOO_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"顾客群","title":"顾客群","name":"CUSGROUPNAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"品类组","title":"品类组","name":"CATEGORYGROUP","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"品类","title":"品类","name":"CATEGORIES","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"子品类","title":"子品类","name":"SUBCATEGORY","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"季节","title":"季节","name":"SEASON","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"款式","title":"款式","name":"PATTERN","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"特征","title":"特征","name":"SPECS","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"风格","title":"风格","name":"GOOSTYLE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"主题","title":"主题","name":"THEME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":12,"comType":"input"},{"caption":"质地","title":"质地","name":"MATERIAL","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"系列","title":"系列","name":"SERIES","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"设计方式","title":"设计方式","name":"DESIGNMODE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"流行度","title":"流行度","name":"POPULARITY","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"厚度","title":"厚度","name":"WARMDEGREE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"商品类别","title":"商品类别","name":"GOOSTYLENAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"},{"caption":"集中管理","title":"集中管理","name":"ISUM","noEdit":false,"dataType":"17","displayFormat":"","trueExpr":"1","displayWidth":0,"comType":"toggle"},{"caption":"必订店群","title":"必订店群","name":"MUSTSHOPGROUPS","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":40,"comType":"input"},{"caption":"供应商","title":"供应商","name":"SUP_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":30,"comType":"input"},{"caption":"颜色","title":"颜色","name":"COLORNAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":20,"comType":"input"},{"caption":"码数","title":"码数","name":"SIZENAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"},{"caption":"建议分配量","title":"建议分配量","name":"PASSIGNAMOUNT","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":6,"comType":"input"},{"caption":"建议分配额","title":"建议分配额","name":"PASSIGNMONEY","noEdit":false,"dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":16,"comType":"input"},{"caption":"实际分配量","title":"实际分配量","name":"RASSIGNAMOUNT","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":6,"comType":"input"},{"caption":"实际分配额","title":"实际分配额","name":"RASSIGNMONEY","noEdit":false,"dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"}]
+    }
+
+    function getData1() {
+        return [{"配货单号":'10003935841000393584100039358410003935841000393584100039358410003935841000393584100039358410003935841000393584',"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-26 17:11:04","FINISHTIME":"2015-10-27 11:17:41","GOO_ID":"348577","BARCODE":"34857701","GOO_NAME":"SANFU(SH)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"杂项","SUBCATEGORY":"披肩","SEASON":"冬2","PATTERN":"披肩","SPECS":"779#落肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"晴纶","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"唐冰服饰","COLORNAME":"枣红（P32428）","SIZENAME":"S","PASSIGNAMOUNT":3,"PASSIGNMONEY":567,"RASSIGNAMOUNT":3,"RASSIGNMONEY":567},{"配货单号":1000393586,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-26 17:11:04","FINISHTIME":"2015-10-27 11:17:41","GOO_ID":"348577","BARCODE":"34857702","GOO_NAME":"SANFU(SH)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"杂项","SUBCATEGORY":"披肩","SEASON":"冬2","PATTERN":"披肩","SPECS":"779#落肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"晴纶","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"唐冰服饰","COLORNAME":"枣红（P32428）","SIZENAME":"M","PASSIGNAMOUNT":2,"PASSIGNMONEY":378,"RASSIGNAMOUNT":2,"RASSIGNMONEY":378},{"配货单号":1000394973,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-27 16:16:13","FINISHTIME":"2015-10-28 10:54:02","GOO_ID":"327898","BARCODE":"32789806","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"背心","SUBCATEGORY":"24寸宽肩","SEASON":"夏1","PATTERN":"A1背心","SPECS":"宽肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"日本棉","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑/白条","SIZENAME":"M","PASSIGNAMOUNT":2,"PASSIGNMONEY":58,"RASSIGNAMOUNT":2,"RASSIGNMONEY":58},{"配货单号":1000394974,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-27 16:16:13","FINISHTIME":"2015-10-28 10:54:02","GOO_ID":"327898","BARCODE":"32789807","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"背心","SUBCATEGORY":"24寸宽肩","SEASON":"夏1","PATTERN":"A1背心","SPECS":"宽肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"日本棉","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑色7","SIZENAME":"S","PASSIGNAMOUNT":2,"PASSIGNMONEY":58,"RASSIGNAMOUNT":2,"RASSIGNMONEY":58},{"配货单号":1000394975,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-27 16:16:13","FINISHTIME":"2015-10-28 10:54:02","GOO_ID":"327898","BARCODE":"32789808","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"背心","SUBCATEGORY":"24寸宽肩","SEASON":"夏1","PATTERN":"A1背心","SPECS":"宽肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"日本棉","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑色7","SIZENAME":"M","PASSIGNAMOUNT":1,"PASSIGNMONEY":29,"RASSIGNAMOUNT":1,"RASSIGNMONEY":29},{"配货单号":1000394976,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-27 16:16:13","FINISHTIME":"2015-10-28 10:54:02","GOO_ID":"327898","BARCODE":"32789810","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"背心","SUBCATEGORY":"24寸宽肩","SEASON":"夏1","PATTERN":"A1背心","SPECS":"宽肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"日本棉","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"象牙白20","SIZENAME":"M","PASSIGNAMOUNT":2,"PASSIGNMONEY":58,"RASSIGNAMOUNT":2,"RASSIGNMONEY":58},{"配货单号":1000395177,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-27 16:16:14","FINISHTIME":"2015-10-28 10:54:02","GOO_ID":"327898","BARCODE":"32789809","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"上装","CATEGORIES":"背心","SUBCATEGORY":"24寸宽肩","SEASON":"夏1","PATTERN":"A1背心","SPECS":"宽肩","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"日本棉","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"象牙白20","SIZENAME":"S","PASSIGNAMOUNT":1,"PASSIGNMONEY":29,"RASSIGNAMOUNT":1,"RASSIGNMONEY":29},{"配货单号":1000396055,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-28 12:30:30","FINISHTIME":"2015-10-28 14:55:45","GOO_ID":"349258","BARCODE":"34925801","GOO_NAME":"SANFU.（MQBE）","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"牛仔裤","SUBCATEGORY":"小脚款","SEASON":"冬2","PATTERN":"B4牛仔裤A","SPECS":"11541抓绒里","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"弹力牛仔料","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"曼崎贝儿","COLORNAME":"黑色","SIZENAME":"25","PASSIGNAMOUNT":7,"PASSIGNMONEY":1183,"RASSIGNAMOUNT":7,"RASSIGNMONEY":1183},{"配货单号":1000397664,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 14:41:00","FINISHTIME":"2015-10-30 11:20:06","GOO_ID":"351863","BARCODE":"35186302","GOO_NAME":"SANFU.(欧)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"短裙","SUBCATEGORY":"包裙","SEASON":"春","PATTERN":"B1短裙","SPECS":"15060#双口袋皮短裙","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"PU","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广州市风向标服饰有限公司","COLORNAME":"黑色","SIZENAME":"M","PASSIGNAMOUNT":2,"PASSIGNMONEY":258,"RASSIGNAMOUNT":2,"RASSIGNMONEY":258},{"配货单号":1000397665,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 14:41:01","FINISHTIME":"2015-10-30 11:20:06","GOO_ID":"351863","BARCODE":"35186301","GOO_NAME":"SANFU.(欧)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"短裙","SUBCATEGORY":"包裙","SEASON":"春","PATTERN":"B1短裙","SPECS":"15060#双口袋皮短裙","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"PU","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广州市风向标服饰有限公司","COLORNAME":"黑色","SIZENAME":"S","PASSIGNAMOUNT":4,"PASSIGNMONEY":516,"RASSIGNAMOUNT":4,"RASSIGNMONEY":516},{"配货单号":1000397666,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 14:41:01","FINISHTIME":"2015-10-30 11:19:49","GOO_ID":"349061","BARCODE":"34906102","GOO_NAME":"SANFU.(欧)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"短裤","SUBCATEGORY":"直筒","SEASON":"冬1","PATTERN":"B1短裤","SPECS":"15052#皮短裤","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"PU","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广州市风向标服饰有限公司","COLORNAME":"黑色","SIZENAME":"M","PASSIGNAMOUNT":3,"PASSIGNMONEY":297,"RASSIGNAMOUNT":3,"RASSIGNMONEY":297},{"配货单号":1000397834,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 15:11:08","FINISHTIME":"2015-10-30 11:20:01","GOO_ID":"349270","BARCODE":"34927002","GOO_NAME":"SANFU(广)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"衬衫T恤","CATEGORIES":"长衬衫","SUBCATEGORY":"宽松款","SEASON":"春","PATTERN":"A4衬衫","SPECS":"6707#格子衬衫","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"格子料","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广达制衣厂","COLORNAME":"红黑格","SIZENAME":"M","PASSIGNAMOUNT":2,"PASSIGNMONEY":318,"RASSIGNAMOUNT":2,"RASSIGNMONEY":318},{"配货单号":1000397835,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 15:11:08","FINISHTIME":"2015-10-30 11:19:26","GOO_ID":"349270","BARCODE":"34927003","GOO_NAME":"SANFU(广)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"衬衫T恤","CATEGORIES":"长衬衫","SUBCATEGORY":"宽松款","SEASON":"春","PATTERN":"A4衬衫","SPECS":"6707#格子衬衫","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"格子料","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广达制衣厂","COLORNAME":"绿蓝格","SIZENAME":"S","PASSIGNAMOUNT":2,"PASSIGNMONEY":318,"RASSIGNAMOUNT":2,"RASSIGNMONEY":318},{"配货单号":1000397837,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-29 15:11:09","FINISHTIME":"2015-10-30 11:19:26","GOO_ID":"349270","BARCODE":"34927005","GOO_NAME":"SANFU(广)","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"衬衫T恤","CATEGORIES":"长衬衫","SUBCATEGORY":"宽松款","SEASON":"春","PATTERN":"A4衬衫","SPECS":"6707#格子衬衫","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"格子料","SERIES":"街头混搭","DESIGNMODE":"供应商设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":0,"MUSTSHOPGROUPS":null,"SUP_NAME":"广达制衣厂","COLORNAME":"黑白格","SIZENAME":"S","PASSIGNAMOUNT":2,"PASSIGNMONEY":318,"RASSIGNAMOUNT":2,"RASSIGNMONEY":318},{"配货单号":1000400631,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-31 20:35:25","FINISHTIME":"2015-11-01 11:15:32","GOO_ID":"349258","BARCODE":"34925803","GOO_NAME":"SANFU.（MQBE）","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"牛仔裤","SUBCATEGORY":"小脚款","SEASON":"冬2","PATTERN":"B4牛仔裤A","SPECS":"11541抓绒里","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"弹力牛仔料","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"曼崎贝儿","COLORNAME":"黑色","SIZENAME":"27","PASSIGNAMOUNT":12,"PASSIGNMONEY":2028,"RASSIGNAMOUNT":12,"RASSIGNMONEY":2028},{"配货单号":1000400632,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-10-31 20:35:25","FINISHTIME":"2015-11-01 11:15:32","GOO_ID":"349258","BARCODE":"34925804","GOO_NAME":"SANFU.（MQBE）","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"牛仔裤","SUBCATEGORY":"小脚款","SEASON":"冬2","PATTERN":"B4牛仔裤A","SPECS":"11541抓绒里","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"弹力牛仔料","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"曼崎贝儿","COLORNAME":"黑色","SIZENAME":"28","PASSIGNAMOUNT":6,"PASSIGNMONEY":1014,"RASSIGNAMOUNT":6,"RASSIGNMONEY":1014},{"配货单号":1000400743,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-11-01 13:15:29","FINISHTIME":"2015-11-02 10:48:40","GOO_ID":"347424","BARCODE":"34742401","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"打底裤","SUBCATEGORY":"复合","SEASON":"冬2","PATTERN":"B4打底裤","SPECS":"106006-D1复合牛奶丝","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"复合斜纹料","SERIES":"街头混搭","DESIGNMODE":"供应商&买手设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑色","SIZENAME":"S","PASSIGNAMOUNT":15,"PASSIGNMONEY":1335,"RASSIGNAMOUNT":15,"RASSIGNMONEY":1335},{"配货单号":1000400744,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-11-01 13:15:30","FINISHTIME":"2015-11-02 10:48:40","GOO_ID":"347424","BARCODE":"34742403","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"打底裤","SUBCATEGORY":"复合","SEASON":"冬2","PATTERN":"B4打底裤","SPECS":"106006-D1复合牛奶丝","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"复合斜纹料","SERIES":"街头混搭","DESIGNMODE":"供应商&买手设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑色","SIZENAME":"L","PASSIGNAMOUNT":12,"PASSIGNMONEY":1068,"RASSIGNAMOUNT":12,"RASSIGNMONEY":1068},{"配货单号":1000400745,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-11-01 13:15:31","FINISHTIME":"2015-11-02 10:48:40","GOO_ID":"347424","BARCODE":"34742402","GOO_NAME":"SANFU.BNS","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"打底裤","SUBCATEGORY":"复合","SEASON":"冬2","PATTERN":"B4打底裤","SPECS":"106006-D1复合牛奶丝","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"复合斜纹料","SERIES":"街头混搭","DESIGNMODE":"供应商&买手设计","POPULARITY":"基本款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"东莞市贝娜丝服饰有限公司","COLORNAME":"黑色","SIZENAME":"M","PASSIGNAMOUNT":5,"PASSIGNMONEY":445,"RASSIGNAMOUNT":5,"RASSIGNMONEY":445},{"配货单号":1000401791,"BRA_ID":"01","MOM订单号":null,"订单号":null,"ASN单据号":null,"收货流水号":null,"FROMSHOPID":"GZY","ARE_ID":"CQ","TOSHOPID":"CQW","SHO_NAME":"万州太白路店","CREATETIME":"2015-11-02 14:10:59","FINISHTIME":"2015-11-02 17:50:45","GOO_ID":"349258","BARCODE":"34925803","GOO_NAME":"SANFU.（MQBE）","CUSGROUPNAME":"街头潮人","CATEGORYGROUP":"下装","CATEGORIES":"牛仔裤","SUBCATEGORY":"小脚款","SEASON":"冬2","PATTERN":"B4牛仔裤A","SPECS":"11541抓绒里","GOOSTYLE":"时尚","THEME":"日韩外贸","MATERIAL":"弹力牛仔料","SERIES":"街头混搭","DESIGNMODE":"买手部设计","POPULARITY":"流行款","WARMDEGREE":null,"GOOSTYLENAME":"集中采购","ISUM":1,"MUSTSHOPGROUPS":null,"SUP_NAME":"曼崎贝儿","COLORNAME":"黑色","SIZENAME":"27","PASSIGNAMOUNT":11,"PASSIGNMONEY":1859,"RASSIGNAMOUNT":null,"RASSIGNMONEY":null}];
+    }
+    function exportHandle(type) {
+        // png设置背景后，不会透明，导致黑底
+        //document.querySelector('.mobileTableMiddle table').style.background = '#fff';
+        tableExport(document.querySelector('.mobileTableMiddle table'), '表格名', type);
+        //document.querySelector('.mobileTableMiddle table').style.background = '';
+    }
+
+
+    //Table.prototype.initTable( table, data, ajax)
+
+</script>
+</html>

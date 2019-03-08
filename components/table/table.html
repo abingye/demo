@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>tableDemo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .blue {
+            color: blue;
+        }
+        .btn-control{
+            padding: 10px;
+        }
+        .btn-control button{ margin: 0 5px; padding: 3px 5px; }
+    </style>
+    <link rel="stylesheet" href="../../../web/font/iconfont/iconfont.css">
+    <link rel="stylesheet" href="../../../web/dist/components/table.mb.css">
+    <link rel="stylesheet" href="../../../web/dist/components/paging.css">
+    <link rel="stylesheet" href="../../../web/plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="../css/table.css"> -->
+
+</head>
+<body>
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<div id="example">
+    <div class="btn-control">
+        <button type="button" onclick="clickHandle('crosstab')">>>> 创建交叉表</button>
+        <button type="button" onclick="clickHandle('abc')">>>> ABC分析</button>
+        <button type="button" onclick="exportHandle('csv')">>>> 导出csv</button>
+        <button type="button" onclick="exportHandle('xls')">>>> 导出excel</button>
+        <button type="button" onclick="exportHandle('doc')">>>> 导出word</button>
+        <button type="button" onclick="exportHandle('image')">>>> 导出png</button>
+        <button type="button" onclick="exportHandle('pdf')">>>> 导出pdf</button>
+    </div>
+    <div style="margin: 10px;">
+        <table id="pcTable" class="min-width">
+            <tbody></tbody>
+        </table>
+        <div id="page"></div>
+        <div id="page2"></div>
+        <div id="page4"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>触底自动加载</h4>
+                </div>
+                <div class="col-md-6">
+                    <h4>触底手动加载</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6" id="page3Container" style="height: 400px;">
+                    <div id="page3">
+                        <div class="pagingScroll">
+                            <table id="pcTable2" class="min-width">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" id="page5Container" style="height: 400px;">
+                    <div id="page5">
+                        <div class="pagingScroll">
+                            <table id="pcTable3" class="min-width">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="height: 1000px;"></div>
+
+<!--<script type="text/babel">-->
+
+<!--</script>-->
+
+</body>
+<script src="../../../web/plugin/y-ui/dist/js/utils.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/modal.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/tableExport.min.js"></script>
+<script src="../../../web/dist/require.js"></script>
+<script src="../../../web/dist/require.config.js"></script>
+<script>
+    require.config({
+        baseUrl: '../../../web/dist/',
+        bundles: {
+            'components/tablePc': ['BasicTable', 'PcTable'],
+            'components/tableMb': ['BasicTable', 'MbTable'],
+            'components/dialog': ['dialog'],
+            'components/statistic': ['statistic'],
+            'components/scrollbar': ['Scrollbar'],
+            'components/paging': ['paging']
+        }
+    });
+    var __extends = (this && this.__extends) || (function () {
+        var extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+</script>
+<script src="../../../web/dist/global.pc.js"></script>
+
+<script>
+    require(['MbTable', 'paging', 'dialog', 'statistic', 'Scrollbar'], function (MbTable, paging, dialog, statistic, Scrollbar) {
+        var table = document.getElementById('pcTable');
+
+        window.page = new paging.Paging({
+            el: document.getElementById('page'),
+            pageOption : [],
+            pageSize : 20,
+            change : function(offset, pageSize ) {
+                console.log(offset, pageSize);
+            }
+        });
+
+        window.page2 = new paging.Paging({
+            el: document.getElementById('page2'),
+            class: 'mini',
+            offset: 80,
+            recordTotal: 3000
+        });
+        window.page4 = new paging.Paging({
+            el: document.getElementById('page4'),
+            pageOption: [],
+            offset: 0,
+            recordTotal: 0,
+            pageSize: 10,
+            last: false,
+            change: function(option) {
+//                setTimeout(function() {
+//                    page4.reset({last: false});
+//                }, 100);
+                console.log(4444 , option);
+            }
+        });
+        page4.go(2);
+        window.Table = new MbTable.MbTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            length : 20,
+            thead: true,
+            table: table,
+            cols: getCols1(),
+            lockRow: true,  // 锁行
+            move: true,
+            indexCol: true,
+            /*pseudoCol: {
+                width: 30,
+                render: function(index) {
+                    var btn;
+
+//                    btn = document.createElement('button');
+//                    btn.innerHTML= '设置';
+
+                    btn = '<i class="iconfont icon-weihu"></i>';
+                    return btn;
+                },
+                click: function(index, event) {
+                    console.log(index, event);
+                }
+            },*/
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+
+                // 伪列
+                bt.pseudoColFun.init({
+                    width: 30,
+                    render: function(index) {
+                        var btn;
+                        btn = '<i class="iconfont icon-weihu"></i>';
+                        return btn;
+                    },
+                    click: function(index, event) {
+                        console.log(index, event);
+                    }
+                });
+
+
+                bt.conf.ajax = function(mtData, myData, callback){
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+
+
+                    /*G.tools.XMLRequest('/api/data', {
+                        success: function(a) {
+                            var data = JSON.parse(a);
+                            callback(data);
+                        }
+                    });*/
+
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+                    }, 100);
+                };
+
+                bt.page.refresh();
+
+                new Scrollbar.Scrollbar({
+                    el: document.querySelector('#pcTable').parentNode
+                });
+            }
+        });
+
+
+
+        window.Table2 = new MbTable.MbTable({
+            Container: document.querySelector('#page3'),
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            expand: {
+                enabled: true,
+                mode: 'accordion',
+                render: function(row, index, callback) {    // 展开行的回调填充函数
+
+                    // 方式一：默认输出当前行所有字段
+                    callback();
+                }
+            },
+            length : 30,
+            thead: true,
+            table: document.getElementById('pcTable2'),
+            cols: getCols1(),
+            lockRow: false,  // 锁行
+            move: true,
+            indexCol: true,
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            //cellMaxWidth: 150,
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+//                console.log(col)
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+
+
+
+
+
+                bt.conf.ajax = function(mtData, myData, callback){
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+                    /*G.tools.XMLRequest('/api/data', {
+                        success: function(a) {
+                            var data = JSON.parse(a);
+                            callback(data);
+                        }
+                    });*/
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+                    }, 100);
+                };
+
+                bt.page.refresh();
+
+                let scrollBar = new Scrollbar.Scrollbar({
+                    el: document.querySelector('#pcTable2').parentNode,
+                    Container: document.querySelector('#page3'),
+                    marginBottom: 54
+                });
+            }
+        });
+
+        window.Table3 = new MbTable.MbTable({
+            Container: document.querySelector('#page5'),
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            length : 30,
+            thead: true,
+            table: document.getElementById('pcTable3'),
+            cols: getCols1(),
+            lockRow: false,  // 锁行
+            move: true,
+            indexCol: true,
+            colResize: true, // 列宽调整
+            lockColNum: 1,
+//            colGroup: true,
+            //cellMaxWidth: 150,
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+                initPagination(bt, isEnd);
+                bt.conf.ajax = function(mtData, myData, callback){
+                    page.reset({
+                        offset: 60,
+                        recordTotal: 229,
+                        last: false,
+                        time: 123,
+                        change: function(offset, pageSize) {
+                            console.log(offset, pageSize);
+                        }
+                    });
+
+                    /*G.tools.XMLRequest('/api/data', {
+                        success: function(a) {
+                            var data = JSON.parse(a);
+                            callback(data);
+                        }
+                    });*/
+
+                    setTimeout(function () {
+                        var start = (mtData.page) * mtData.length, end = start + mtData.length;
+                        var data = getData1().slice(start, end);
+                        callback(data);
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+        window.page3 = new paging.Paging({
+            el: document.getElementById('page3'),
+            scroll: {
+                Container: document.getElementById('page3Container'),
+                auto: true
+            },
+            change: function(option, callback) {
+                // console.log(offset, pageSize, callback, resolve);
+                // 加载完成，隐蔽加载动画
+                setTimeout(()=> {
+                    page3.reset({last: false});  // 加载完成
+                //page3.reset({last: true}); // 加载完成，没有更多数据了
+            }, 1000);
+            }
+        });
+        window.page5 = new paging.Paging({
+            el: document.getElementById('page5'),
+            scroll: {
+                Container: document.getElementById('page5Container'),
+                auto: false
+            },
+            change: function(option, callback) {
+
+                // 加载完成，隐蔽加载动画
+                setTimeout(()=> {
+                    page5.reset({last: false});  // 加载完成
+                //page5.reset({last: true}); // 加载完成，没有更多数据了
+            }, 1000);
+            }
+        });
+
+
+
+
+
+        var stat = new statistic.Statistic();
+        window.clickHandle = function(type) {
+            if(type === 'crosstab') {
+                var cols = getCols1(),
+                    data = stat.crossTab({
+                        row: ['配货单号', 'GOO_ID'],
+                        col: ['GOO_NAME', 'CUSGROUPNAME'],
+                        val: ['PASSIGNAMOUNT', 'RASSIGNMONEY'],
+                        cols: Table.conf.cols,
+                        data: Table.tableData
+                    });
+            }
+            else if(type === 'abc') {
+                var data = stat.abc({
+                    row: 'GOO_ID',
+                    val: 'PASSIGNMONEY',
+                    a: 65,
+                    b: 85,
+                    cols: Table.conf.cols,
+                    data: Table.tableData
+                });
+                console.log('ABC', data);
+            }
+        }
+    });
+
+
+    function initPagination(bTable, isEnd) {
+        var html1 = '<div class="myPagenation btn-group"><div class="btn-group dropup" dropdown-toggle>',
+            html2 = '', html3 = '<button class="btn btn-link disabled" data-action="currentPage">第<span id="CurrentPageNum">1</span>页</button>' +
+            '<button class="btn btn-link disabled" data-action="firstPage"><span class="icon iconfont icon-zhuye"></span></button>' +
+            '<button class="btn btn-link disabled" data-action="previousPage"><span class="icon iconfont icon-shangyiye"></span></button>' +
+            ("<button class=\"btn btn-link " + (isEnd ? 'disabled' : '') + "\" data-action=\"nextPage\"><span class=\"icon iconfont icon-arrow-right\"></span></button></div>");
+
+        var pagination = G.d.create(html1 + html2 + html3), currentPageDom = pagination.querySelector('#CurrentPageNum'), previousDom = pagination.querySelector('[data-action=previousPage]'), firstDom = pagination.querySelector('[data-action=firstPage]'), nextDom = pagination.querySelector('[data-action=nextPage]');
+        var tableBottom = G.d.create('<div style="text-align: center" class="table-out-bottom"></div>');
+        tableBottom.appendChild(pagination);
+        bTable.wrapperGet().appendChild(tableBottom);
+
+        // 事件绑定
+        G.d.on(pagination, 'click', function () {
+            switch (this.dataset.action) {
+                case 'firstPage':
+                    //第一页
+                    bTable.page.go(1);
+                    break;
+                case 'previousPage':
+                    //上一页
+                    bTable.page.previous();
+                    break;
+                case 'nextPage':
+                    //下一页
+                    bTable.page.next();
+                    break;
+                default:
+            }
+        });
+        statusChange(isEnd, true);
+        // 翻页事件
+        bTable.wrapperGet().addEventListener('page.bt', function (e) {
+            statusChange(e.detail.isEnd, e.detail.type === 'refresh');
+        });
+
+        // 分页按钮开启与禁用和当前页数更新
+        function statusChange(isEnd, refresh) {
+            if (refresh && isEnd) {
+                pagination.classList.add('hide');
+            }
+            else {
+                var currPage = bTable.currentPageGet(), method = void 0;
+                pagination.classList.remove('hide');
+                method = currPage <= 1 ? 'add' : 'remove';
+                previousDom.classList[method]('disabled');
+                firstDom.classList[method]('disabled');
+                method = isEnd ? 'add' : 'remove';
+                nextDom.classList[method]('disabled');
+                currentPageDom.innerHTML = (currPage === 0 ? 1 : currPage).toString();
+            }
+        }
+    }
+    function getData1() {
+        return [
+            {
+                "配货单号": 1000393584,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-26 17:11:04",
+                "FINISHTIME": "2015-10-27 11:17:41",
+                "GOO_ID": "348577",
+                "BARCODE": "34857701",
+                "GOO_NAME": "SANFU(SH)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "杂项",
+                "SUBCATEGORY": "披肩",
+                "SEASON": "冬2",
+                "PATTERN": "披肩",
+                "SPECS": "779#落肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "晴纶",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "唐冰服饰",
+                "COLORNAME": "枣红（P32428）",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 3,
+                "PASSIGNMONEY": 567,
+                "RASSIGNAMOUNT": 3,
+                "RASSIGNMONEY": 567
+            },
+            {
+                "配货单号": 1000393586,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-26 17:11:04",
+                "FINISHTIME": "2015-10-27 11:17:41",
+                "GOO_ID": "348577",
+                "BARCODE": "34857702",
+                "GOO_NAME": "SANFU(SH)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "杂项",
+                "SUBCATEGORY": "披肩",
+                "SEASON": "冬2",
+                "PATTERN": "披肩",
+                "SPECS": "779#落肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "晴纶",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "唐冰服饰",
+                "COLORNAME": "枣红（P32428）",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 378,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 378
+            },
+            {
+                "配货单号": 1000394973,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-27 16:16:13",
+                "FINISHTIME": "2015-10-28 10:54:02",
+                "GOO_ID": "327898",
+                "BARCODE": "32789806",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "背心",
+                "SUBCATEGORY": "24寸宽肩",
+                "SEASON": "夏1",
+                "PATTERN": "A1背心",
+                "SPECS": "宽肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "日本棉",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑/白条",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 58,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 58
+            },
+            {
+                "配货单号": 1000394974,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-27 16:16:13",
+                "FINISHTIME": "2015-10-28 10:54:02",
+                "GOO_ID": "327898",
+                "BARCODE": "32789807",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "背心",
+                "SUBCATEGORY": "24寸宽肩",
+                "SEASON": "夏1",
+                "PATTERN": "A1背心",
+                "SPECS": "宽肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "日本棉",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑色7",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 58,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 58
+            },
+            {
+                "配货单号": 1000394975,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-27 16:16:13",
+                "FINISHTIME": "2015-10-28 10:54:02",
+                "GOO_ID": "327898",
+                "BARCODE": "32789808",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "背心",
+                "SUBCATEGORY": "24寸宽肩",
+                "SEASON": "夏1",
+                "PATTERN": "A1背心",
+                "SPECS": "宽肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "日本棉",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑色7",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 1,
+                "PASSIGNMONEY": 29,
+                "RASSIGNAMOUNT": 1,
+                "RASSIGNMONEY": 29
+            },
+            {
+                "配货单号": 1000394976,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-27 16:16:13",
+                "FINISHTIME": "2015-10-28 10:54:02",
+                "GOO_ID": "327898",
+                "BARCODE": "32789810",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "背心",
+                "SUBCATEGORY": "24寸宽肩",
+                "SEASON": "夏1",
+                "PATTERN": "A1背心",
+                "SPECS": "宽肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "日本棉",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "象牙白20",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 58,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 58
+            },
+            {
+                "配货单号": 1000395177,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-27 16:16:14",
+                "FINISHTIME": "2015-10-28 10:54:02",
+                "GOO_ID": "327898",
+                "BARCODE": "32789809",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "上装",
+                "CATEGORIES": "背心",
+                "SUBCATEGORY": "24寸宽肩",
+                "SEASON": "夏1",
+                "PATTERN": "A1背心",
+                "SPECS": "宽肩",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "日本棉",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "象牙白20",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 1,
+                "PASSIGNMONEY": 29,
+                "RASSIGNAMOUNT": 1,
+                "RASSIGNMONEY": 29
+            },
+            {
+                "配货单号": 1000396055,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-28 12:30:30",
+                "FINISHTIME": "2015-10-28 14:55:45",
+                "GOO_ID": "349258",
+                "BARCODE": "34925801",
+                "GOO_NAME": "SANFU.（MQBE）",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "牛仔裤",
+                "SUBCATEGORY": "小脚款",
+                "SEASON": "冬2",
+                "PATTERN": "B4牛仔裤A",
+                "SPECS": "11541抓绒里",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "弹力牛仔料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "曼崎贝儿",
+                "COLORNAME": "黑色",
+                "SIZENAME": "25",
+                "PASSIGNAMOUNT": 7,
+                "PASSIGNMONEY": 1183,
+                "RASSIGNAMOUNT": 7,
+                "RASSIGNMONEY": 1183
+            },
+            {
+                "配货单号": 1000397664,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 14:41:00",
+                "FINISHTIME": "2015-10-30 11:20:06",
+                "GOO_ID": "351863",
+                "BARCODE": "35186302",
+                "GOO_NAME": "SANFU.(欧)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "短裙",
+                "SUBCATEGORY": "包裙",
+                "SEASON": "春",
+                "PATTERN": "B1短裙",
+                "SPECS": "15060#双口袋皮短裙",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "PU",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广州市风向标服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 258,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 258
+            },
+            {
+                "配货单号": 1000397665,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 14:41:01",
+                "FINISHTIME": "2015-10-30 11:20:06",
+                "GOO_ID": "351863",
+                "BARCODE": "35186301",
+                "GOO_NAME": "SANFU.(欧)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "短裙",
+                "SUBCATEGORY": "包裙",
+                "SEASON": "春",
+                "PATTERN": "B1短裙",
+                "SPECS": "15060#双口袋皮短裙",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "PU",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广州市风向标服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 4,
+                "PASSIGNMONEY": 516,
+                "RASSIGNAMOUNT": 4,
+                "RASSIGNMONEY": 516
+            },
+            {
+                "配货单号": 1000397666,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 14:41:01",
+                "FINISHTIME": "2015-10-30 11:19:49",
+                "GOO_ID": "349061",
+                "BARCODE": "34906102",
+                "GOO_NAME": "SANFU.(欧)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "短裤",
+                "SUBCATEGORY": "直筒",
+                "SEASON": "冬1",
+                "PATTERN": "B1短裤",
+                "SPECS": "15052#皮短裤",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "PU",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广州市风向标服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 3,
+                "PASSIGNMONEY": 297,
+                "RASSIGNAMOUNT": 3,
+                "RASSIGNMONEY": 297
+            },
+            {
+                "配货单号": 1000397834,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 15:11:08",
+                "FINISHTIME": "2015-10-30 11:20:01",
+                "GOO_ID": "349270",
+                "BARCODE": "34927002",
+                "GOO_NAME": "SANFU(广)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "衬衫T恤",
+                "CATEGORIES": "长衬衫",
+                "SUBCATEGORY": "宽松款",
+                "SEASON": "春",
+                "PATTERN": "A4衬衫",
+                "SPECS": "6707#格子衬衫",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "格子料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广达制衣厂",
+                "COLORNAME": "红黑格",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 318,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 318
+            },
+            {
+                "配货单号": 1000397835,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 15:11:08",
+                "FINISHTIME": "2015-10-30 11:19:26",
+                "GOO_ID": "349270",
+                "BARCODE": "34927003",
+                "GOO_NAME": "SANFU(广)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "衬衫T恤",
+                "CATEGORIES": "长衬衫",
+                "SUBCATEGORY": "宽松款",
+                "SEASON": "春",
+                "PATTERN": "A4衬衫",
+                "SPECS": "6707#格子衬衫",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "格子料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广达制衣厂",
+                "COLORNAME": "绿蓝格",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 318,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 318
+            },
+            {
+                "配货单号": 1000397837,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-29 15:11:09",
+                "FINISHTIME": "2015-10-30 11:19:26",
+                "GOO_ID": "349270",
+                "BARCODE": "34927005",
+                "GOO_NAME": "SANFU(广)",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "衬衫T恤",
+                "CATEGORIES": "长衬衫",
+                "SUBCATEGORY": "宽松款",
+                "SEASON": "春",
+                "PATTERN": "A4衬衫",
+                "SPECS": "6707#格子衬衫",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "格子料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 0,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "广达制衣厂",
+                "COLORNAME": "黑白格",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 2,
+                "PASSIGNMONEY": 318,
+                "RASSIGNAMOUNT": 2,
+                "RASSIGNMONEY": 318
+            },
+            {
+                "配货单号": 1000400631,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-31 20:35:25",
+                "FINISHTIME": "2015-11-01 11:15:32",
+                "GOO_ID": "349258",
+                "BARCODE": "34925803",
+                "GOO_NAME": "SANFU.（MQBE）",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "牛仔裤",
+                "SUBCATEGORY": "小脚款",
+                "SEASON": "冬2",
+                "PATTERN": "B4牛仔裤A",
+                "SPECS": "11541抓绒里",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "弹力牛仔料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "曼崎贝儿",
+                "COLORNAME": "黑色",
+                "SIZENAME": "27",
+                "PASSIGNAMOUNT": 12,
+                "PASSIGNMONEY": 2028,
+                "RASSIGNAMOUNT": 12,
+                "RASSIGNMONEY": 2028
+            },
+            {
+                "配货单号": 1000400632,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-10-31 20:35:25",
+                "FINISHTIME": "2015-11-01 11:15:32",
+                "GOO_ID": "349258",
+                "BARCODE": "34925804",
+                "GOO_NAME": "SANFU.（MQBE）",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "牛仔裤",
+                "SUBCATEGORY": "小脚款",
+                "SEASON": "冬2",
+                "PATTERN": "B4牛仔裤A",
+                "SPECS": "11541抓绒里",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "弹力牛仔料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "曼崎贝儿",
+                "COLORNAME": "黑色",
+                "SIZENAME": "28",
+                "PASSIGNAMOUNT": 6,
+                "PASSIGNMONEY": 1014,
+                "RASSIGNAMOUNT": 6,
+                "RASSIGNMONEY": 1014
+            },
+            {
+                "配货单号": 1000400743,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-11-01 13:15:29",
+                "FINISHTIME": "2015-11-02 10:48:40",
+                "GOO_ID": "347424",
+                "BARCODE": "34742401",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "打底裤",
+                "SUBCATEGORY": "复合",
+                "SEASON": "冬2",
+                "PATTERN": "B4打底裤",
+                "SPECS": "106006-D1复合牛奶丝",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "复合斜纹料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商&买手设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "S",
+                "PASSIGNAMOUNT": 15,
+                "PASSIGNMONEY": 1335,
+                "RASSIGNAMOUNT": 15,
+                "RASSIGNMONEY": 1335
+            },
+            {
+                "配货单号": 1000400744,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-11-01 13:15:30",
+                "FINISHTIME": "2015-11-02 10:48:40",
+                "GOO_ID": "347424",
+                "BARCODE": "34742403",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "打底裤",
+                "SUBCATEGORY": "复合",
+                "SEASON": "冬2",
+                "PATTERN": "B4打底裤",
+                "SPECS": "106006-D1复合牛奶丝",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "复合斜纹料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商&买手设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "L",
+                "PASSIGNAMOUNT": 12,
+                "PASSIGNMONEY": 1068,
+                "RASSIGNAMOUNT": 12,
+                "RASSIGNMONEY": 1068
+            },
+            {
+                "配货单号": 1000400745,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-11-01 13:15:31",
+                "FINISHTIME": "2015-11-02 10:48:40",
+                "GOO_ID": "347424",
+                "BARCODE": "34742402",
+                "GOO_NAME": "SANFU.BNS",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "打底裤",
+                "SUBCATEGORY": "复合",
+                "SEASON": "冬2",
+                "PATTERN": "B4打底裤",
+                "SPECS": "106006-D1复合牛奶丝",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "复合斜纹料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "供应商&买手设计",
+                "POPULARITY": "基本款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "东莞市贝娜丝服饰有限公司",
+                "COLORNAME": "黑色",
+                "SIZENAME": "M",
+                "PASSIGNAMOUNT": 5,
+                "PASSIGNMONEY": 445,
+                "RASSIGNAMOUNT": 5,
+                "RASSIGNMONEY": 445
+            },
+            {
+                "配货单号": 1000401791,
+                "BRA_ID": "01",
+                "MOM订单号": null,
+                "订单号": null,
+                "ASN单据号": null,
+                "收货流水号": null,
+                "FROMSHOPID": "GZY",
+                "ARE_ID": "CQ",
+                "TOSHOPID": "CQW",
+                "SHO_NAME": "万州太白路店",
+                "CREATETIME": "2015-11-02 14:10:59",
+                "FINISHTIME": "2015-11-02 17:50:45",
+                "GOO_ID": "349258",
+                "BARCODE": "34925803",
+                "GOO_NAME": "SANFU.（MQBE）",
+                "CUSGROUPNAME": "街头潮人",
+                "CATEGORYGROUP": "下装",
+                "CATEGORIES": "牛仔裤",
+                "SUBCATEGORY": "小脚款",
+                "SEASON": "冬2",
+                "PATTERN": "B4牛仔裤A",
+                "SPECS": "11541抓绒里",
+                "GOOSTYLE": "时尚",
+                "THEME": "日韩外贸",
+                "MATERIAL": "弹力牛仔料",
+                "SERIES": "街头混搭",
+                "DESIGNMODE": "买手部设计",
+                "POPULARITY": "流行款",
+                "WARMDEGREE": null,
+                "GOOSTYLENAME": "集中采购",
+                "ISUM": 1,
+                "MUSTSHOPGROUPS": null,
+                "SUP_NAME": "曼崎贝儿",
+                "COLORNAME": "黑色",
+                "SIZENAME": "27",
+                "PASSIGNAMOUNT": 11,
+                "PASSIGNMONEY": 1859,
+                "RASSIGNAMOUNT": null,
+                "RASSIGNMONEY": null
+            }
+        ]
+    }
+
+
+    function getCols1() {
+        return [
+            {"caption":"配货单号","title":"配货单号","name":"配货单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"}
+            ,{"caption":"分部号","title":"分部号","name":"BRA_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":8,"comType":"input"}
+            ,{"caption":"MOM订单号","title":"MOM订单号","name":"MOM订单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"}
+            ,{"caption":"订单号","title":"订单号","name":"订单号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"}
+            ,{"caption":"ASN单据号","title":"ASN单据号","name":"ASN单据号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"}
+            ,{"caption":"收货流水号","title":"收货流水号","name":"收货流水号","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":"","comType":"input"}
+            ,{"caption":"源店号","title":"源店号","name":"FROMSHOPID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"地区号","title":"地区号","name":"ARE_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"目标店号","title":"目标店号","name":"TOSHOPID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"店名","title":"店名","name":"SHO_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"创建时间","title":"创建时间","name":"CREATETIME","noEdit":false,"dataType":"12","displayFormat":"yyyy-MM-dd HH:mm:ss","trueExpr":"","displayWidth":0,"comType":"datetime"}
+            ,{"caption":"结束时间","title":"结束时间","name":"FINISHTIME","noEdit":false,"dataType":"12","displayFormat":"yyyy-MM-dd HH:mm:ss","trueExpr":"","displayWidth":0,"comType":"datetime"}
+            ,{"caption":"货号","title":"货号","name":"GOO_ID","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":7,"comType":"input"}
+            ,{"caption":"条码","title":"条码","name":"BARCODE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"}
+            ,{"caption":"品名","title":"品名","name":"GOO_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"顾客群","title":"顾客群","name":"CUSGROUPNAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"品类组","title":"品类组","name":"CATEGORYGROUP","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"品类","title":"品类","name":"CATEGORIES","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"子品类","title":"子品类","name":"SUBCATEGORY","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"季节","title":"季节","name":"SEASON","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"款式","title":"款式","name":"PATTERN","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"特征","title":"特征","name":"SPECS","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"风格","title":"风格","name":"GOOSTYLE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"主题","title":"主题","name":"THEME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":12,"comType":"input"}
+            ,{"caption":"质地","title":"质地","name":"MATERIAL","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"系列","title":"系列","name":"SERIES","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"设计方式","title":"设计方式","name":"DESIGNMODE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"流行度","title":"流行度","name":"POPULARITY","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"厚度","title":"厚度","name":"WARMDEGREE","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"商品类别","title":"商品类别","name":"GOOSTYLENAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":0,"comType":"input"}
+            ,{"caption":"集中管理","title":"集中管理","name":"ISUM","noEdit":false,"dataType":"17","displayFormat":"","trueExpr":"1","displayWidth":0,"comType":"toggle"}
+            ,{"caption":"必订店群","title":"必订店群","name":"MUSTSHOPGROUPS","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":40,"comType":"input"}
+            ,{"caption":"供应商","title":"供应商","name":"SUP_NAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":30,"comType":"input"}
+            ,{"caption":"颜色","title":"颜色","name":"COLORNAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":20,"comType":"input"}
+            ,{"caption":"码数","title":"码数","name":"SIZENAME","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":10,"comType":"input"}
+            ,{"caption":"建议分配量","title":"建议分配量","name":"PASSIGNAMOUNT","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":6,"comType":"input"}
+            ,{"caption":"建议分配额","title":"建议分配额","name":"PASSIGNMONEY","noEdit":false,"dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":16,"comType":"input"}
+            ,{"caption":"实际分配量","title":"实际分配量","name":"RASSIGNAMOUNT","noEdit":false,"dataType":"","displayFormat":"","trueExpr":"","displayWidth":6,"comType":"input"}
+            ,{"caption":"实际分配额","title":"实际分配额","name":"RASSIGNMONEY","noEdit":false,"dataType":"11","displayFormat":"###.00","trueExpr":"","displayWidth":15,"comType":"input"}]
+    }
+
+    function getCols2() {
+        return [{
+            "title": "SANFU(SH)",
+            "name": "GOO_NAME",
+            "children": [{
+                "title": "街头潮人",
+                "name": "CUSGROUPNAME",
+                "children": [{"title": "建议分配额", "name": "PASSIGNMONEY", "type": "val", "group": 0}, {
+                    "title": "实际分配额",
+                    "name": "RASSIGNMONEY",
+                    "type": "val",
+                    "group": 1
+                }]
+            }]
+        }, {
+            "title": "SANFU.BNS",
+            "name": "GOO_NAME",
+            "children": [{
+                "title": "街头潮人",
+                "name": "CUSGROUPNAME",
+                "children": [{"title": "建议分配额", "name": "PASSIGNMONEY", "type": "val", "group": 0}, {
+                    "title": "实际分配额",
+                    "name": "RASSIGNMONEY",
+                    "type": "val",
+                    "group": 1
+                }]
+            }]
+        }, {
+            "title": "SANFU.（MQBE）",
+            "name": "GOO_NAME",
+            "children": [{
+                "title": "街头潮人",
+                "name": "CUSGROUPNAME",
+                "children": [{"title": "建议分配额", "name": "PASSIGNMONEY", "type": "val", "group": 0}, {
+                    "title": "实际分配额",
+                    "name": "RASSIGNMONEY",
+                    "type": "val",
+                    "group": 1
+                }]
+            }]
+        }, {
+            "title": "SANFU.(欧)",
+            "name": "GOO_NAME",
+            "children": [{
+                "title": "街头潮人",
+                "name": "CUSGROUPNAME",
+                "children": [{"title": "建议分配额", "name": "PASSIGNMONEY", "type": "val", "group": 0}, {
+                    "title": "实际分配额",
+                    "name": "RASSIGNMONEY",
+                    "type": "val",
+                    "group": 1
+                }]
+            }]
+        }, {
+            "title": "SANFU(广)",
+            "name": "GOO_NAME",
+            "children": [{
+                "title": "街头潮人",
+                "name": "CUSGROUPNAME",
+                "children": [{"title": "建议分配额", "name": "PASSIGNMONEY", "type": "val", "group": 0}, {
+                    "title": "实际分配额",
+                    "name": "RASSIGNMONEY",
+                    "type": "val",
+                    "group": 1
+                }]
+            }]
+        }, {"title": "汇总"}, {"title": "建议分配额 汇总"}, {"title": "实际分配额 汇总"}];
+    }
+
+
+    function exportHandle(type) {
+        // png设置背景后，不会透明，导致黑底
+        //document.querySelector('.mobileTableMiddle table').style.background = '#fff';
+        tableExport(document.querySelector('.mobileTableMiddle table'), '表格名', type);
+        //document.querySelector('.mobileTableMiddle table').style.background = '';
+    }
+
+
+
+
+
+    //Table.prototype.initTable( table, data, ajax)
+
+</script>
+</html>

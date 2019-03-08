@@ -1,0 +1,32 @@
+.drop-wrapper {
+  position: relative;
+  width: 600px;
+  padding: 8px;
+  height: 180px;
+  z-index: 1000;
+  button{
+     position: absolute;
+     top: 80px;
+     left: 30%;
+     margin-left: 15px;
+     display: block;
+     border: none;
+     background-color: transparent;
+     outline: none;
+   }
+  .btn-toright{
+    margin-top: -20px;
+    &::before {
+      font-family: "iconfont";
+      content: "\e6b7";
+    }
+  }
+  .btn-toleft{
+    margin-top: 20px;
+    &::before{
+      font-family: "iconfont";
+      content: "\e626";
+    }
+  }
+}
+

@@ -1,0 +1,137 @@
+.popover-wrapper{
+  position: absolute;
+  z-index: 1000;
+  min-width:150px;
+  max-width:300px;
+  -webkit-transition: opacity 1s;
+  transition: opacity 1s;
+  -webkit-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transform: none;
+  transform: none;
+  opacity: 0;
+  border-radius: 4px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  border: 1px solid rgba(0,0,0,.3);
+  .arrow{
+    position: absolute;
+    z-index: 1000;
+    overflow: hidden;
+    width: 26px;
+    height: 26px;
+    &:after{
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      content: ' ';
+      -webkit-transform: rotate(45deg);
+      transform: rotate(45deg);
+      border-radius: 3px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.3);
+    }
+  }
+  .arrow-bottom{
+    top: -26px;
+    &:after{
+      top: 19px;
+    }
+  }
+  .arrow-top{
+    bottom: -26px;
+    &:after{
+      bottom: 19px;
+    }
+  }
+  .arrow-left{
+    right: -26px;
+    &:after{
+      right: 19px;
+    }
+  }
+  .arrow-right{
+    left: -26px;
+    &:after{
+      left: 19px;
+    }
+  }
+  .popover-list{
+    padding: 0;
+    margin:0;
+    border-radius: 4px;
+    overflow:hidden;
+    .popover-item{
+      box-sizing: border-box;
+      padding: 11px;
+      color: #333;
+      text-align: center;
+      //font-size: 16px;
+      //line-height:21px;
+      cursor: pointer;
+      max-width:268px;
+      word-break: break-all;
+      position:relative;
+      a{
+        color: #333;
+      }
+      .popover-icon{
+        position:absolute;
+        left:0;
+        text-indent:0;
+        line-height:22px;
+      }
+    }
+    .popover-item + .popover-item{
+      border-top:1px solid #c8c7cc;
+    }
+    .popover-item:hover{
+      background-color: #f3f3f3;
+      color: #108ee9;
+    }
+    .popover-item:hover a{
+      color: #108ee9;
+    }
+  }
+}
+.to-opacity{
+  animation: toOpacity .3s forwards;
+  -webkit-animation:  toOpacity .3s forwards;
+}
+.to-lucency{
+  animation: toLucency .3s forwards;
+  -webkit-animation:  toLucency .3s forwards;
+}
+@keyframes toLucency {
+  from{
+    opacity: 1;
+  }
+  to{
+    opacity: 0;
+  }
+}
+@keyframes toOpacity {
+  from{
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
+}
+@-webkit-keyframes toLucency {
+  from{
+    opacity: 1;
+  }
+  to{
+    opacity: 0;
+  }
+}
+@-webkit-keyframes toOpacity {
+  from{
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
+}

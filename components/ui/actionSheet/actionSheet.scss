@@ -1,0 +1,86 @@
+$cancel-height: 44px;
+.action-sheet-pc{
+  .modal-body{
+    padding: 0;
+  }
+}
+.action-sheet-wrapper {
+  width: 100%;
+  position: absolute;
+  height: auto;
+  bottom: 0;
+  background-color: #f2f2f2;
+  .action-sheet-buttons {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background-color: #f2f2f2;
+    flex-wrap: wrap;
+    &.single-line{
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
+    .btn-wrapper {
+      padding: 10px 0;
+      flex: 0 0 33.33%;
+      height: 95px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-box-align: center;
+      display: -webkit-flex;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      i {
+        font-size: 30px !important;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        background-color: #cfcfcf;
+        color: #fff;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content: center;
+        @import "colors";
+        @each $color in $colors{
+          &.fg-#{"" + $color}{
+            color: $color;
+          }
+          &.bg-#{"" + $color}{
+            background-color: $color;
+          }
+        }
+      }
+      .bg-mail{
+        background-color: #3baffc;
+      }
+      .bg-download{
+        background-color: #333333;
+      }
+      .bg-weixin{
+        background-color: #3bbb07;
+      }
+      div {
+        color: #666666;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .action-sheet-cancel {
+    width: 100%;
+    height: $cancel-height;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 16px;
+    color: #333333;
+  }
+}
+
+

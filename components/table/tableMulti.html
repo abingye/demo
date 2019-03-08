@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>tableDemo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <style>
+        * {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .blue {
+            color: blue;
+        }
+        .btn-control{
+            padding: 10px;
+        }
+        .btn-control button{ margin: 0 5px; padding: 3px 5px; }
+    </style>
+    <link rel="stylesheet" href="../../../web/font/iconfont/iconfont.css">
+    <link rel="stylesheet" href="../../../web/dist/components/table.pc.css">
+    <link rel="stylesheet" href="../../../web/dist/components/paging.css">
+    <link rel="stylesheet" href="../../../web/plugin/bootstrap/bootstrap3/dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="../css/table.css"> -->
+
+</head>
+<body>
+<div id="example">
+    <h4>交叉表一</h4>
+    <div style="margin: 10px;">
+        <table id="pcTable" class="min-width">
+            <tbody></tbody>
+        </table>
+    </div>
+    <h4>交叉表二</h4>
+    <div style="margin: 10px;">
+        <table id="pcTable2" class="min-width">
+            <tbody></tbody>
+        </table>
+    </div>
+    <h4>ABC分析</h4>
+    <div style="margin: 10px;">
+        <table id="pcTable3" class="min-width">
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div style="height: 1000px;"></div>
+
+<!--<script type="text/babel">-->
+
+<!--</script>-->
+
+</body>
+<script src="../../../web/plugin/y-ui/dist/js/utils.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/modal.min.js"></script>
+<script src="../../../web/plugin/y-ui/dist/js/tableExport.min.js"></script>
+<script src="../../../web/dist/require.js"></script>
+<script src="../../../web/dist/require.config.js"></script>
+<script>
+    require.config({
+        baseUrl: '../../../web/dist/',
+        bundles: {
+            'components/tablePc': ['BasicTable', 'PcTable'],
+            'components/tableMb': ['BasicTable', 'MbTable'],
+            'components/dialog': ['dialog'],
+            'components/statistic': ['statistic'],
+            'components/paging': ['paging']
+        }
+    });
+    var __extends = (this && this.__extends) || (function () {
+        var extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+</script>
+<script src="../../../web/dist/global.pc.js"></script>
+
+<script>
+    require(['PcTable', 'paging', 'dialog', 'statistic'], function (PcTable, paging, dialog, statistic) {
+        var table = document.getElementById('pcTable');
+
+        window.Table = new PcTable.PcTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            sort: false,
+            length : 20,
+            table: table,
+            indexCol: true,
+            multi: {
+                enabled: true,
+                cols: getCols()
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+
+                bt.conf.ajax = function(mtData, myData, callback){
+                    setTimeout(function () {
+                        // console.log(getData());
+                        callback(getData());
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+        var table2 = document.getElementById('pcTable2');
+        window.Table2 = new PcTable.PcTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            sort: false,
+            length : 20,
+            table: table2,
+            indexCol: true,
+            multi: {
+                enabled: true,
+                cols: getCols2()
+            },
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+
+                bt.conf.ajax = function(mtData, myData, callback){
+                    setTimeout(function () {
+                        // console.log(getData());
+                        callback(getData2());
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+
+        var table3 = document.getElementById('pcTable3');
+        window.Table3 = new PcTable.PcTable({
+            ajax : function (mtData, myData, callback) {
+                callback([]);
+            },
+            sort: false,
+            length : 20,
+            table: table3,
+            cols: getCols3(),
+            indexCol: true,
+            textFormat: function (trData, col) {
+//                var text = trData[col.name];
+                var text = G.rule.formatTableText(trData[col.name], col);
+                return text;
+            },
+            beforeShow: function (trData, colsData) {
+                var row = {tr: {}, td: []};
+//                console.log(colsData);
+                colsData.forEach(function (col, index) {
+                    var classes = [],
+                        text = trData[col.name],
+                        attrs = {};
+
+                    // 样式处理
+                    if (typeof text === 'number') {
+                        classes.push('text-right');
+                    }
+                    if (col.webDrillAddr) {
+                        attrs['data-href'] = col.webDrillAddr.dataAddr;
+                        classes.push('blue');
+                    }
+
+
+                    if (classes[0]) {
+                        attrs['class'] = classes.join(' ');
+                    }
+
+                    row.td.push(attrs);
+                });
+                return row;
+            },
+            click: function (target, bt) {
+                //alert(target.dataset.href);
+            },
+            clickSelector: 'tbody td',
+            colMenu: [
+                {
+                    multi: true,
+                    title: '锁定/解锁列',
+                    callback: function (btn, cols, btnDom, bt) {
+                        bt.colToggleLock(cols[0].dataset.col);
+                    }
+                }],
+            onComplete: function (bt,isEnd) {
+
+                bt.conf.ajax = function(mtData, myData, callback){
+                    setTimeout(function () {
+                        // console.log(getData());
+                        callback(getData3());
+                    }, 100);
+                };
+
+                bt.page.refresh();
+            }
+        });
+
+
+    });
+
+
+
+    function getCols() {
+        return [[{"title":"分部","name":"BRA_NAME","rowspan":2},{"colspan":3,"title":"SANFU.L","name":"GOO_NAME"},{"colspan":3,"title":"SANFU.F","name":"GOO_NAME"},{"colspan":3,"title":"汇总","name":"stat_SUM"}],[{"title":"厚度","name":"WARMDEGREE-0","type":"val"},{"title":"进价","name":"INPRICE-1","type":"val"},{"title":"定价","name":"PRICE-2","type":"val"},{"title":"厚度","name":"WARMDEGREE-3","type":"val"},{"title":"进价","name":"INPRICE-4","type":"val"},{"title":"定价","name":"PRICE-5","type":"val"},{"title":"厚度汇总","name":"WARMDEGREE_SUM"},{"title":"进价汇总","name":"INPRICE_SUM"},{"title":"定价汇总","name":"PRICE_SUM"}]];
+    }
+
+    function getData() {
+        return [[{"title":"女装","name":"BRA_NAME"},{"name":"WARMDEGREE-0","title":null},{"name":"INPRICE-1","title":240},{"name":"PRICE-2","title":585},{"name":"WARMDEGREE-3","title":"--"},{"name":"INPRICE-4","title":270},{"name":"PRICE-5","title":594},{"name":"WARMDEGREE_SUM","title":0},{"name":"INPRICE_SUM","title":510},{"name":"PRICE_SUM","title":1179}]];
+    }
+
+
+    function getCols2() {
+        return [
+            [{title: "分部", name: "BRA_NAME", rowspan: 2}, {colspan: 3, title: "SANFU.L", name: "1504251286372"},{colspan: 3, title: "SANFU.F", name: "1504251286373"},{title: "汇总", name: "stat_SUM", rowspan: 2}, {title: "厚度汇总", name: "WARMDEGREE_SUM", rowspan: 2},{title: "进价汇总", name: "INPRICE_SUM", rowspan: 2},{title: "定价汇总", name: "PRICE_SUM", rowspan: 2}],
+            [{title: "厚度", name: "WARMDEGREE-0", type: "val"},{title: "进价", name: "INPRICE-1", type: "val"}, {title: "定价", name: "PRICE-2", type: "val"},{title: "厚度", name: "WARMDEGREE-3", type: "val"}, {title: "进价", name: "INPRICE-4", type: "val"},{title: "定价", name: "PRICE-5", type: "val"}]];
+    }
+
+    function getData2() {
+        return [
+            [  {rowspan: 20, title: "女装", name: "BRA_NAME"},
+                {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [{name: "WARMDEGREE-0", title: null},
+                {name: "INPRICE-1", title: 16},
+                {name: "PRICE-2", title: 39},
+                {name: "WARMDEGREE-3", title: "--"},
+                {name: "INPRICE-4", title: "--"},
+                {name: "PRICE-5", title: "--"},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 16},
+                {name: "PRICE_SUM", title: 39}
+            ],
+            [ {name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ],
+            [ {name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ],
+            [ {name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ],
+            [ {name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ],
+            [ {name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ],
+            [{name: "WARMDEGREE-0", title: "--"},
+                {name: "INPRICE-1", title: "--"},
+                {name: "PRICE-2", title: "--"},
+                {name: "WARMDEGREE-3", title: null},
+                {name: "INPRICE-4", title: 45},
+                {name: "PRICE-5", title: 99},
+                {name: "STAT_SUM", title: NaN},
+                {name: "WARMDEGREE_SUM", title: 0},
+                {name: "INPRICE_SUM", title: 45},
+                {name: "PRICE_SUM", title: 99}
+            ]
+        ]
+    }
+
+
+    function getCols3() {
+        return [{"title":"建议分配额类","name":"classify"},{"title":"建议分配额项数","name":"group"},{"title":"建议分配额占比","name":"ratio"},{"title":"建议分配额总价占比","name":"total_ratio"},{"title":"建议分配额总价均值","name":"total_avg"}];
+    }
+
+    function getData3() {
+        return [{"classify":"A类","group":2,"ratio":"20.00%","total_ratio":"55.8%","total_avg":"875.00"},{"classify":"B类","group":2,"ratio":"20.00%","total_ratio":"28.53%","total_avg":"447.00"},{"classify":"C类","group":6,"ratio":"60.00%","total_ratio":"15.63%","total_avg":"81.67"}];
+    }
+
+
+</script>
+</html>

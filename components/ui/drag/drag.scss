@@ -1,0 +1,38 @@
+.drag-container {
+  .top-drag-wrapper {
+    opacity:0;
+    position: absolute;
+    top:-2px;
+    left:0;
+    right:0;
+    height:4px;
+    cursor: n-resize;
+  }
+  .right-drag-wrapper {
+    opacity:0;
+    position: absolute;
+    right:-2px;
+    top:0;
+    bottom: 0;
+    width:4px;
+    cursor: w-resize;
+  }
+  .left-drag-wrapper {
+    opacity:0;
+    position: absolute;
+    left:-2px;
+    top:0;
+    bottom: 0;
+    width:4px;
+    cursor: w-resize;
+  }
+  .bottom-drag-wrapper {
+    opacity:0;
+    position: absolute;
+    bottom:-2px;
+    left:0;
+    right:0;
+    height:4px;
+    cursor: n-resize;
+  }
+}

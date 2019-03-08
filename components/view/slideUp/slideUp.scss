@@ -1,0 +1,44 @@
+.slide-up{
+  background: #fff;
+  z-index: 1002;
+  .slide-up-slideEl{
+    height: 0;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    overflow: hidden;
+    transition: height .3s;
+    .slide-up-title{
+      border-bottom: 1px solid #ddd;
+      height: 30px;
+      padding: 7px;
+    }
+    .slide-up-content{
+      padding: 7px;
+      overflow: auto;
+    }
+  }
+  .slide-up-fixedEl{
+    height: 30px;
+    padding: 0 0 0 7px;
+    border: 1px solid #aaa;
+    .slide-up-text{
+      display: inline-block;
+      width: calc(100% - 34px);
+      padding: 4px;
+    }
+    .slide-up-icon{
+      display: inline-block;
+      button{
+        vertical-align: unset;
+      }
+    }
+  }
+  &.bottomRight{
+    position: fixed;
+    right: 10px;
+    bottom: 45px;
+    @media (min-width: 500px) {
+      right: 3%;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+ //.select-box{
+//  z-index: 9999;
+//  input {
+//    position: absolute;
+//    width: 20px;
+//    height: 20px;
+//    opacity: 0;
+//    z-index:9998;
+//    &[type=checkbox]:checked + label::after
+//    {
+//      font-family: "iconfont";
+//      content: "\e68a";
+//      color: #3f51b5;
+//      position: absolute;
+//      top: 0;
+//      left: 0;
+//      display: inline-block;
+//      width: 20px;
+//      height: 20px;
+//      padding-top: 1px;
+//      font-size: 12px;
+//      font-weight:bold;
+//      line-height: 20px;
+//      color: #007AFF;
+//      text-align: center;
+//    }
+//    &[type=radio]:checked + label::after
+//    {
+//      position: absolute;
+//      background-color: #007AFF;
+//      content: "";
+//      display: inline-block;
+//      left: 50%;
+//      bottom: 50%;
+//      margin-left: -19px;
+//      margin-bottom: -3px;
+//      width: 8px;
+//      height:8px;
+//      border-radius: 99px;
+//      transition: all 0.3s cubic-bezier(0.455, 0.03, 0.215, 1.33) 0s;
+//    }
+//  }
+//
+//  label {
+//    position: relative;
+//    display: inline-block;
+//    padding-left: 10px;
+//    vertical-align: middle;
+//    min-height: 22px;
+//    margin-bottom: 0;
+//    font-weight: 300;
+//    cursor: pointer;
+//    &.label-checkbox::before {
+//      position: absolute;
+//      left: 0;
+//      display: inline-block;
+//      width: 20px;
+//      height: 20px;
+//      content: "";
+//      background-color: #fff;
+//      border: 1px solid #e0e0e0;
+//      border-radius: 3px;
+//      -webkit-transition: all .3s ease-in-out 0s;
+//      -o-transition: all .3s ease-in-out 0s;
+//      transition: all .3s ease-in-out 0s;
+//    }
+//    &.label-radio::before {
+//      background-color: #ffffff;
+//      border: 1px solid #d0d0d0;
+//      content: "";
+//      display: inline-block;
+//      height: 20px;
+//      left: 0;
+//      margin-right: 10px;
+//      position: absolute;
+//      width: 20px;
+//      border-radius: 99px;
+//      bottom: 2px;
+//      transition: all 0.3s cubic-bezier(0.455, 0.03, 0.215, 1.33) 0s;
+//    }
+//  }
+//}

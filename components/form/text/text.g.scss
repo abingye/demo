@@ -1,0 +1,59 @@
+.text-input{
+  position: relative;
+  min-width: 50px;
+
+  // 去掉input number类型自带的上下箭头
+  input[type='number']{
+    -moz-appearance: textfield;
+  }
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  &.disabled{
+    *{
+      cursor: not-allowed!important;
+    }
+  }
+
+  &.error{
+      border:1px solid red;
+  }
+
+  & > input{
+    background: transparent;
+    border: none;
+    height: 30px;
+    width: 100%;
+    padding: 6px 7px;
+    font-size: inherit;
+  }
+
+  & > .btn-group{
+    position: absolute;
+    right: 0;
+    height: 100%;
+    top: 0;
+
+    .icon{
+      font-size: 16px;
+      width: 20px;
+      color: #999;
+      background: transparent;
+      text-align: center;
+      height: 100%;
+      padding:0;
+    }
+  }
+}
+.textarea-input{
+  &.height-auto{
+    resize: none;
+    border: none;
+    height: 30px;
+    line-height: 16px;
+    margin-bottom: 0;
+    font-size: inherit;
+  }
+}

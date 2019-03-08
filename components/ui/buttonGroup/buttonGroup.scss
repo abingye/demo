@@ -1,0 +1,66 @@
+.topBtns{
+  .iconfont{
+    padding-right: 3px;
+  }
+}
+.selectMore{
+  color: rgb(0,122,255);
+  text-align: center;
+  line-height: 25px;
+  padding: 0;
+}
+.moreButUl{
+  color: rgb(0,122,255);
+  font-size: 13px;
+  li{
+    padding: 9px;
+    .iconfont{
+      padding-right: 10px;
+    }
+  }
+  min-width:120px;
+}
+.moreBtn{
+  border: 1px solid #007AFF;
+  color: #007AFF;
+  height: 24px;
+  display: inline-block;
+  text-align: center;
+  line-height: 24px;
+  margin-left: -1px;
+  width:60px;
+  padding: 0;
+  border-radius:0px 3px 3px 0px;
+  position: relative;
+  font-size: 12px;
+  background-color: rgb(251,251,251);
+  .moreBtn_text{
+    margin-left: -13px;
+    line-height: 24px;
+  }
+  .iconPos{
+     left:34px;
+  }
+  .icon-paixu{
+    position: absolute;
+    font-size: 24px;
+    right: -2px;
+    margin-top: 1px;
+  }
+  &:hover{
+    color: rgb(0,122,255);
+    background-color: rgb(247,247,248);
+  }
+}
+
+.btnsLeft,.btnsRight,.btnsMiddle{
+  a:only-child{
+    border-radius:3px 3px 3px 3px;
+  }
+  //a{
+    //&:hover{
+    //  background-color: rgb(251,251,251) !important;
+    //}
+  //}
+}
+

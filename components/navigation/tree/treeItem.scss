@@ -1,0 +1,154 @@
+.element-tree-node.tree-virtual{
+  overflow: visible !important;
+}
+.element-tree-node.tree-node{
+  .tree-text-wrapper{
+    font-size: 13px;
+    padding-right: 4px;
+
+    > * {
+      line-height: 24px;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .tree-open-icon{
+      width: 20px;
+      text-align: center;
+      margin-right: 6px;
+    }
+
+    .tree-icon{
+      margin-right: 2px;
+      width: 16px;
+    }
+    .tree-check-box{
+      width: 20px;
+      position: relative;
+      bottom: 2px;
+      margin-right: 2px;
+    }
+  }
+
+}
+
+.element-tree-node.tree-node.tree-virtual{
+  padding-top: 10px;
+    & > :not(.tree-child-wrapper){
+      display: none !important;
+    }
+    .select-box{
+      display: inline-block;
+      margin-left: 6px;
+      .label-checkbox{
+        &::before{
+          width : 15px !important;
+          height: 15px !important;
+        }
+      }
+      .check-span{
+        padding-left: 16px;
+        &::after{
+          width : 15px !important;
+          height: 15px !important;
+          font-size: 9px !important;
+          top: -2px !important;
+        }
+      }
+    }
+}
+//.menu-node,.tree-node{
+//      white-space: nowrap;
+//       overflow: hidden;
+//      .hide-tree{
+//        display: none;
+//      }
+//      .show-tree{
+//        display: block;
+//      }
+//      .tree-open-icon{
+//        display: inline-block !important;
+//        cursor: pointer;
+//        z-index: 10000;
+//        position: relative;
+//      }
+//     /* .tree-child-wrapperLine{
+//        background : url('http://www.jq22.com/demo/bootstrap-ztree3201708300202/css/bootstrapStyle/img/line_conn.png') -3px 0px repeat-y;
+//      }*/
+//      .tree-child-wrapper{
+//        transition:height 0.2s;
+//        -moz-transition:height 0.2s;
+//        -webkit-transition:height 0.2s;
+//        -o-transition:height 0.2s;
+//        position: relative;
+//       /* & > :not(.tree-has-checkbox){
+//          padding-left: 12px;
+//        }
+//        .line{
+//          background-image: url('http://www.jq22.com/demo/bootstrap-ztree3201708300202/css/bootstrapStyle/img/bootstrap.png');
+//          width: 21px;
+//          height: 25px;
+//          position: absolute;
+//          left: 17px;
+//          background-position: -84px -21px;
+//          z-index: 999;
+//        }
+//        li{
+//          &:last-child{
+//            &>.line{
+//              background-position: -84px -42px;
+//            }
+//            &>.tree-child-wrapper{
+//              background : unset;
+//            }
+//          }
+//        }*/
+//      }
+//      .tree-text-wrapper{
+//        -moz-user-select: none;
+//        -khtml-user-select: none;
+//        user-select: none;
+//        cursor: pointer;
+//        font-size:12px;
+//        display: inline-block;
+//        height: 24px;
+//        line-height: 24px;
+//        margin-right: 10px;
+//        width: 100%;
+//        .tree-icon{
+//          display: inline-block !important;
+//          padding-right: 0px;
+//        }
+//        &:hover{
+//          color:#108ee9;
+//        }
+//      }
+//      .selected{
+//        background-color: rgb(236,246,253);
+//        color:#108ee9;
+//        width: 100%;
+//        height: 100%;
+//      }
+//      .tree-rotate-icon {
+//        animation:rotation 1s  linear infinite;
+//        -webkit-animation:rotation 1s  linear infinite;
+//      }
+//
+//      ul,li{
+//        list-style: none;
+//        padding: 0;
+//        margin: 0;
+//        width: 100%;
+//      }
+//    /*  li{
+//        &:last-child{
+//          &>.tree-child-wrapper{
+//            background : unset;
+//          }
+//        }
+//      }*/
+//      i{
+//        width: auto !important;
+//        height: auto !important;
+//      }
+//    }

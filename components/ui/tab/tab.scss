@@ -1,0 +1,27 @@
+.nav-tabs{
+  display: block;
+  >li.active>a{
+    border: none;
+    border-bottom: 2px solid #007AFF;
+    color: #007AFF;
+    &:hover{
+      border: none;
+      border-bottom: 2px solid #007AFF;
+      color: #007AFF;
+    }
+  }
+}
+
+.tab-content{
+  padding: 0 15px;
+}
+.nav-tabs>li>a{
+  color: #8e8e93;
+  border-radius: 0;
+}
+.tab-pane{
+  display: none;
+  &.active{
+    display: block;
+  }
+}

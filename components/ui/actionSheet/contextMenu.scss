@@ -1,0 +1,21 @@
+.g-context-menu {
+  width: 180px;
+  background-color: #ffffff;
+  border-radius: 3px;
+  border: solid 1px #e2e2e2;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  padding: 0 20px;
+  position: absolute;
+  .btn-wrapper {
+    display: flex;
+    display: -webkit-flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 36px;
+    color: #666666;
+    font-size: 14px;
+    .btn-content {
+      margin-left: 13px;
+    }
+  }
+}

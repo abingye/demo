@@ -1,0 +1,211 @@
+.pagination-wrapper {
+  overflow-y: auto;
+  position: relative;
+  .scroll-wrapper {
+    width: 100%;
+  }
+  .ball-wapper {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #efeff4;
+    box-shadow: 0 4px 10px #bbb;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background-clip: padding-box;
+    display: none;
+    top: 24px;
+    left: 50%;
+    margin-left: -21px;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  .pagination-nomore {
+    margin: 0;
+    padding: 6px 0;
+    text-align: center;
+    font-size: 14px;
+    color: #aaa;
+  }
+  .btn-wrapper {
+    text-align: center;
+  }
+}
+
+.paging-wrapper {
+  text-align: center;
+  //margin-top: 5px;
+  //margin-bottom: 5px;
+  font-size: 13px;
+  line-height: 30px;
+  span {
+    padding: 3px 5px;
+    display: inline-block;
+  }
+  a {
+    font-style: normal;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .paging-container {
+    a {
+      font-size: 12px;
+      min-width: 32px;
+      display: inline-block;
+      height: 32px;
+      line-height: 32px;
+      padding: 0 5px;
+      margin: 0 3px;
+      font-weight: bold;
+      color: #495060;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      background: #fff;
+      border-radius: 3px;
+      border: 1px solid #e1e4e8;
+    }
+  }
+  a:not(.paging-disabled):hover, a:not(.paging-disabled):focus {
+    text-decoration: none;
+    border-color: $primary!important;
+    color: $primary;
+  }
+  /*a.paging-prev5, a.paging-next5 {
+    color: #d1d5da;
+    .dot {
+      display: block;
+    }
+    .arrow {
+      display: none;
+    }
+  }
+  a:hover.paging-prev5, a:hover.paging-next5 {
+    border-color: #e1e4e8;
+    .dot {
+      display: none;
+    }
+    .arrow {
+      display: block;
+    }
+  }*/
+  a.paging-disabled, em.paging-disabled, a:hover.paging-disabled, a:focus.paging-disabled {
+    color: #d1d5da;
+    cursor: default;
+    /*background-color: #fafbfc;
+    cursor: default;*/
+    background-color: #fff;
+    border-color: #e1e4e8;
+  }
+  a.paging-disabled, a:hover.paging-disabled {
+    cursor: not-allowed;
+  }
+  a.paging-current {
+    color: #fff!important;
+    background-color: $primary;
+    border-color: $primary!important;
+    cursor: default;
+  }
+  input, select {
+    border-radius: 3px;
+    border: 1px solid #e1e4e8;
+    padding: 0 5px;
+    width: 60px;
+    height: 32px;
+    line-height: 32px;
+    margin: 0 5px;
+    outline: none;
+  }
+  select {
+    width: 100px;
+    background-color: #fff;
+  }
+  .paging-option{
+    vertical-align: middle;;
+  }
+  .paging-elevator {
+    vertical-align: middle;
+    .paging-elevator-wrapper{
+      padding: 0 5px;
+    }
+  }
+/*
+  .pagingTotal {
+  }
+  .pagingOption {
+  }*/
+
+}
+
+.paging-wrapper.mini {
+  font-size: 13px;
+  height: 30px;
+  line-height: 20px;
+  box-sizing: content-box;
+  .paging-container {
+    a {
+      min-width: 24px;
+      height: 24px;
+      line-height: 22px;
+      border: 1px solid $default_4;
+    }
+  }
+  select, input {
+    height: 24px;
+    line-height: 24px;
+    //width: 25px;
+  }
+  input {
+    width: 40px;
+  }
+}
+
+.paging-elevator.mini {
+  em {
+    display: inline-block;
+  }
+}
+
+.paging-bottom-wrapper {
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  .paging-bottom {
+    overflow: hidden;
+    width: 100%;
+    padding: 15px 0;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    visibility: hidden;
+    .iconfont {
+      font-size: 14px;
+    }
+    .paging-loading {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      display: inline-block;
+      transition: -webkit-transform 0.3s ease-in;
+      transform: rotate(180deg);
+      animation: spinner-spin 1s step-end infinite;
+    }
+    .paging-loading:before {
+      display: block;
+      width: 100%;
+      height: 100%;
+      content: '';
+      background-image: url('data:image/svg+xml;charset=utf-8,<svg viewBox=\'0 0 120 120\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\'><defs><line id=\'l\' x1=\'60\' x2=\'60\' y1=\'7\' y2=\'27\' stroke=\'%236c6c6c\' stroke-width=\'11\' stroke-linecap=\'round\'/></defs><g><use xlink:href=\'%23l\' opacity=\'.27\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(30 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(60 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(90 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(120 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.27\' transform=\'rotate(150 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.37\' transform=\'rotate(180 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.46\' transform=\'rotate(210 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.56\' transform=\'rotate(240 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.66\' transform=\'rotate(270 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.75\' transform=\'rotate(300 60,60)\'/><use xlink:href=\'%23l\' opacity=\'.85\' transform=\'rotate(330 60,60)\'/></g></svg>');
+    }
+    .paging-pull-caption {
+      display: inline-block;
+    }
+  }
+
+  .paging-scroll {
+    width: 100%;
+  }
+}
